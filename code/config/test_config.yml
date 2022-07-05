@@ -1,0 +1,11 @@
+---
+helper_config:
+  verbose: True
+  read_lines: 0
+tool_config:
+  run: True
+  data:
+    - 23
+    - 40
+    - 50
+  message: Hello
