@@ -1,7 +1,7 @@
 ---
 box.width:  0.8
 alpha: 0.7
-jitter.width: 0.6
+jitter.width: 0.1
 point.size: 1.8
 text.size: 10
 stat.label: Fold increase to w/o
