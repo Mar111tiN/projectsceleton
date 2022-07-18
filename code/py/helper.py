@@ -2,31 +2,28 @@ import pandas as pd
 
 from script_utils import show_output, load_config
 
-def load_file_and_store(file, output_excel="", verbose=True, read_lines = -1, **kwargs):
+def load_and_save(file, output_excel="", verbose=False, read_lines = -1, **kwargs):
     '''
     testing that all paths are working
     '''
 
     if read_lines == -1:
-        if verbose:
-            show_output(f"Loading file {file}", color="normal")
+        show_output(f"Loading file {file}", color="normal")
         df = pd.read_excel(file, sheet_name="Data")
     else:
-        if verbose:
-            show_output(f"Reading {read_lines} lines of file {file}", color="normal")
-            df = pd.read_excel(file, sheet_name="Data", nrows=read_lines)
-    for i, col in enumerate(df.columns):
-        show_output(f"Detected column{i}: {col}", color="time")
+        show_output(f"Reading {read_lines} lines of file {file}", color="normal")
+        df = pd.read_excel(file, sheet_name="Data", nrows=read_lines)
     if verbose:
-        show_output(f"Detected{len(df.index)} data entries", color="warning")
+        for i, col in enumerate(df.columns):
+            show_output(f"Detected column{i}: {col}", color="time")
+    show_output(f"Detected {len(df.index)} data entries", color="warning")
     if output_excel:
         df.to_csv(output_excel, sep=",", index=False)
-        if verbose:
-            show_output(f"Converted  to csv and saved as csv to {output_excel}", color="success")
+        show_output(f"Converted  to csv and saved as csv to {output_excel}", color="success")
     return df
 
 
-def tool(run=True, data=[], message="Good Bye", **kwargs):
+def simple_message(run=True, data=[], message="Good Bye", **kwargs):
     '''
     showing passing of additional configs
     '''
@@ -35,6 +32,8 @@ def tool(run=True, data=[], message="Good Bye", **kwargs):
         show_output(message)
         for i, d in enumerate(data):
             show_output(f"row{i}: {d}")
+    else:
+        show_output("I shall not run", color="warning")
         
 
 def config_wrapper(*args, config_file="", **kwargs):
@@ -46,14 +45,13 @@ def config_wrapper(*args, config_file="", **kwargs):
     if config_file:
         config = load_config(config_file)
 
-    helper_config = config['helper_config']
+    LaS_config = config['load_and_save']
 
     # load in the kwargs to overwrite config
-    helper_config.update(kwargs)
-    load_file_and_store(*args, **helper_config)
+    LaS_config.update(kwargs)
+    df = load_and_save(*args, **LaS_config)
 
-    tool_config = config['tool_config']
-    tool_config.update(kwargs)
-
-    tool(**tool_config)
-
+    sm_config = config['simple_message']
+    sm_config.update(kwargs)
+    simple_message(**sm_config)
+    return df

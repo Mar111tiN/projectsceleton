@@ -1,8 +1,8 @@
 ---
-helper_config:
-  verbose: True
+load_and_save:  # here are the configs for the "load_and_save function"
+  verbose: False
   read_lines: 0
-tool_config:
+simple_message:
   run: True
   data:
     - 23
