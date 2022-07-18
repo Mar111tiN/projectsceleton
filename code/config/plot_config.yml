@@ -1,0 +1,14 @@
+---
+box.width:  0.5
+alpha: 0.9
+jitter.width: 0.03
+point.size: 0.8
+text.size: 10
+pops:
+  Tnaive: darkgray
+  Tscm: "#F9837C"
+  Tcm: "#ADAE2C"
+  Tem: "#34B8F7"
+  Temra: "#EB7AF4"
+  CD8: white
+save.dims: [8,11]
