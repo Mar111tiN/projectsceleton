@@ -3,10 +3,11 @@
 + quickly setting up a new project for data analysis
 + enforce an organized workflow
 + working with jupyter notebooks and R files in conjunction
-
++ suggests the 
 
 ## contains two separate project examples in a shared folder
 + ### The python project converts a simple excel-file into a csv-file and stores it in an output folder
++ ### just run the code/nb/template.ipynb notebook from jupyter (see setup below)
 + #### it showcases:
     * setting of global paths as anchors for data stored relative to it
     * importing externally and locally stored code and configs
@@ -20,6 +21,7 @@
 
 + ### The R project is a simple plot that displays two data types in a combined plot
    * expression of STAT3 on T cell subpopulations upon stimulation vs qPCR-expression of CXCR3-isoforms (if you need to know)
++ ####  just run the code/R/scripting.R and follow along..
 + ####  it showcases (mostly similar to python branch..):
     * setting of global paths as anchors for data stored relative to it
     * importing externally and locally stored code, configs and constants
@@ -30,7 +32,7 @@
             * loads these configs (updating kwargs it finds at function call)
             * runs the combined plot by passing 
     * possible organisation of data and code
-
+![R project structure](https://github.com/Mar111tiN/projectsceleton/blob/master/info/R_folder.png?raw=true)
 ## setup
 * clone the repository into \<your basefolder\>, rename to <projectfolder> and move to into the folder:
    + `cd <basefolder> && git clone git@github.com:Mar111tiN/projectsceleton.git`

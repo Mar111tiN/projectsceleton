@@ -8,22 +8,30 @@ home_path <- Sys.getenv('HOME')
 
 # compose the base_path from path relative to home
 # !!!!! you have to set this to the root path of the sceleton folder
+# or however you have renamed it to
 # can also be absolute path without str_glue
-base_path <- str_glue("{home_path}/Sites/tuto/sceleton")
+base_path <- file.path(home_path, "Sites/tuto/sceleton")
 
+# this loads the code from setup.R that auto-sets the paths that are
+# ..fixed relative to the base_folder (can be adjusted to your structure)
+# if you stick to the folder structure, you can leave it as-is
 setwd(base_path)
 source("code/R/setup.R")
 
-# load the functions and configs used for plotting the data
-source(get_path(R_path, "plot.R"))
-source(get_path(R_path, "utils.R"))
+### here you can load the code that you:
+  # either always use (should become part of your own "sceleton")
+  # you refactored as project-specific code base
+  # you can move them later to a central code base (or github)
+# load the functions and configs used for plotting the data and config_loading
+source(file.path(R_path, "plot.R"))
+source(file.path(R_path, "utils.R"))
 
 # setting the files for loading the data
-stat.file <- get_path(data_path, "stat3.csv")
-qPCR_file <- get_path(data_path, "qPCR.csv")
-pdf.file <- get_path(img_path, "test_figure.pdf")
-config.default <- get_path(config_path, "plot_config.yml")
-config.gray <- get_path(config_path, "plot_config_gray.yml")
+stat.file <- file.path(data_path, "stat3.csv")
+qPCR_file <- file.path(data_path, "qPCR.csv")
+pdf.file <- file.path(img_path, "test_figure.pdf")
+config.default <- file.path(config_path, "plot_config.yml")
+config.gray <- file.path(config_path, "plot_config_gray.yml")
 
 
 #### the function combined_plot is loaded from plot.R
