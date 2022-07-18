@@ -17,8 +17,9 @@
             * loads these configs (updating kwargs it finds at function call)
             * runs the two "core" functions" supplying tool-specific keyword-arguments
     * possible organisation of data and code
-    * most importantly, COLORED OUTPUT!!!
 ![Python project structure](info/py_folder_mid.png?raw=true)
+
+    * and most importantly, COLORED OUTPUT!!!
 + ### The R project is a simple plot that displays two data types in a combined plot
    * expression of STAT3 on T cell subpopulations upon stimulation vs qPCR-expression of CXCR3-isoforms (if you need to know)
 + ####  just run the code/R/scripting.R and follow along..
