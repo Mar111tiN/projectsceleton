@@ -4,6 +4,8 @@ alpha: 0.9
 jitter.width: 0.03
 point.size: 0.8
 text.size: 10
+stat.label: Fold increase to w/o
+qPCR.label: mRNA relative expression
 pops:
   Tnaive: darkgray
   Tscm: "#F9837C"
