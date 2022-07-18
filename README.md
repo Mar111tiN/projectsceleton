@@ -18,7 +18,7 @@
             * runs the two "core" functions" supplying tool-specific keyword-arguments
     * possible organisation of data and code
     * most importantly, COLORED OUTPUT!!!
-
+![Python project structure](info/py_folder_mid.png?raw=true)
 + ### The R project is a simple plot that displays two data types in a combined plot
    * expression of STAT3 on T cell subpopulations upon stimulation vs qPCR-expression of CXCR3-isoforms (if you need to know)
 + ####  just run the code/R/scripting.R and follow along..
@@ -33,7 +33,9 @@
             * runs the combined plot by passing 
     * possible organisation of data and code
 
-![R project structure](info/R_folder_small.png?raw=true)
+![R project structure](info/R_folder_mid.png?raw=true)
+
+   + everything starts from scripting.R and code, data and output are refered to from there
 
 ## setup
 * clone the repository into \<your basefolder\>, rename to <projectfolder> and move to into the folder:
