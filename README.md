@@ -7,7 +7,7 @@
 
 ## contains two separate project examples in a shared folder
 + ### The python project converts a simple excel-file into a csv-file and stores it in an output folder
-+ ### it showcases:
++ #### it showcases:
     * setting of global paths as anchors for data stored relative to it
     * importing externally and locally stored code and configs
     * using yaml config files to store project settings to load
@@ -18,6 +18,18 @@
     * possible organisation of data and code
     * most importantly, COLORED OUTPUT!!!
 
++ ### The R project is a simple plot that displays two data types in a combined plot
+   * expression of STAT3 on T cell subpopulations upon stimulation vs qPCR-expression of CXCR3-isoforms (if you need to know)
++ ####  it showcases (mostly similar to python branch..):
+    * setting of global paths as anchors for data stored relative to it
+    * importing externally and locally stored code, configs and constants
+    * refactoring of different code into separate files
+    * using yaml config files to store project settings to load
+        + this is useful for graphical output with lots of settings for graphical output
+        + the config_wrapper
+            * loads these configs (updating kwargs it finds at function call)
+            * runs the combined plot by passing 
+    * possible organisation of data and code
 
 ## setup
 * clone the repository into \<your basefolder\>, rename to <projectfolder> and move to into the folder:
