@@ -32,7 +32,9 @@
             * loads these configs (updating kwargs it finds at function call)
             * runs the combined plot by passing 
     * possible organisation of data and code
-![R project structure](https://github.com/Mar111tiN/projectsceleton/blob/master/info/R_folder_small.png?raw=true)
+
+![R project structure](info/R_folder_small.png?raw=true)
+
 ## setup
 * clone the repository into \<your basefolder\>, rename to <projectfolder> and move to into the folder:
    + `cd <basefolder> && git clone git@github.com:Mar111tiN/projectsceleton.git`
