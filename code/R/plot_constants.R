@@ -1,5 +1,5 @@
 ##### CONSTANTS #####################
-# here you can enter all functions that are needed for defaults etc
+# here you can enter all data stores and stuff that is needed for defaults etc
 Tcell_pop_labels <- c(
     expression(T["NAIVE"]),
     expression(T["SCM"]),

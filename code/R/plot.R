@@ -1,11 +1,16 @@
+#### plot.R does everything needed for the plot functionality:
+
+# loads its own dependencies
 library(tidyverse)
 library(patchwork)
 
 
 # load required code from other files
-source(get_path(R_path, "stat.R"))
-source(get_path(R_path, "plot_constants.R"))
+source(file.path(R_path, "stat.R"))
+source(file.path(R_path, "plot_constants.R"))
 
+
+### because the theme block of ggplot is used several times, I refactored it into a separate function
 set_theme <- function(text.size=10, ...) {
     theme_light() +
     theme(
@@ -17,6 +22,9 @@ set_theme <- function(text.size=10, ...) {
     )
 }
 
+
+# splits the two plots into separate functions that are called both in the combined_plot function
+
 ######## STAT PLOT #################
 stat_plot <- function(stat_df,
   pop.label = Tcell_pop_labels,
@@ -26,13 +34,17 @@ stat_plot <- function(stat_df,
   jitter.width = 0.03,
   alpha = 0.9,
   point.size=0.8,
+  boxplot.type=5,
+  boxplot.probs=c(0.1, 0.25, 0.75, .9),
   ...
 ) {
+
     stat_df %>% 
     ggplot(aes(Pop, STAT3_MFI, fill = Pop)) +
     stat_summary(
         geom="boxplot",
-        fun.data = bp_vals,
+        ## uses the statistics helper that returns the stat function with the appropriate arguments
+        fun.data = bp_vals(type=boxplot.type, probs=boxplot.probs), 
         show.legend = NA,
         width=box.width,    # set
         alpha=0.9,
@@ -135,6 +147,7 @@ combined_plot <- function(
         ...
         )
   ############### COMBINE PLOTS ########################
+  # uses the patchwork library that allows easy setup of multiple graphs in one
   combined.plot <- (stat.plot / q.plot) + plot_layout(guides = "collect")
   if (save.fig != "") {
     ggsave(save.fig, combined.plot, width = save.dims[1], height = save.dims[2])

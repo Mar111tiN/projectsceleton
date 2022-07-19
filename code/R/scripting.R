@@ -1,7 +1,3 @@
-library(tidyverse)
-library(patchwork)
-library(readxl)
-
 # load the home path
 # Sys.getenv loads environment variables
 home_path <- Sys.getenv('HOME')
@@ -30,9 +26,8 @@ source(file.path(R_path, "utils.R"))
 stat.file <- file.path(data_path, "stat3.csv")
 qPCR_file <- file.path(data_path, "qPCR.csv")
 pdf.file <- file.path(img_path, "test_figure.pdf")
-config.default <- file.path(config_path, "plot_config.yml")
-config.gray <- file.path(config_path, "plot_config_gray.yml")
 
+stat.func
 
 #### the function combined_plot is loaded from plot.R
 # it has a lot of settings that you can play with
@@ -45,6 +40,7 @@ combined_plot(
   alpha = 0.9,
   point.size = 1,
   text.size = 15,
+  boxplot.type = 5,
   pop.colors = Tcell_colors,
   pop.label = Tcell_pop_labels,
   pop.levels = Tcell_pops,
@@ -56,9 +52,10 @@ combined_plot(
 
 #### for easier control, the graphical settings can be placed in a 
 # yaml file that controls many of these settings
-# you can change these settings and restart the function
+# you can change these settings and rerun the function
 # parameters in function call overrule yaml-settings to combine defaults and current settings
-# this allows 
+config.default <- file.path(config_path, "plot_config.yml")
+
 config_wrapper(
   stat.file, qPCR_file,
   save.fig = pdf.file,
@@ -67,8 +64,14 @@ config_wrapper(
   config_file = config.default
 )
 
-### so you can also store several graphics settings and load them in need
-# for different publications, presentations etc.
+### so you can also store several graphics settings and load them when needed
+# ... for different publications, presentations etc.
+config.gray <- file.path(config_path, "plot_config_gray.yml")
+
+
+config_test(config.default)
+
+
 config_wrapper(
   stat.file, qPCR_file,
   save.fig = pdf.file,

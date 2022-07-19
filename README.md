@@ -17,6 +17,7 @@
             * loads these configs (updating kwargs it finds at function call)
             * runs the two "core" functions" supplying tool-specific keyword-arguments
     * possible organisation of data and code
+
 ![Python project structure](info/py_folder_mid.png?raw=true)
 
     * and most importantly, COLORED OUTPUT!!!

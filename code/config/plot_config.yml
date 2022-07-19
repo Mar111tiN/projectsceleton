@@ -1,5 +1,7 @@
 ---
 box.width:  0.5
+boxplot.type: 5
+boxplotp.probs: [0.1, 0.25, 0.75, .9]
 alpha: 0.9
 jitter.width: 0.03
 point.size: 0.8
