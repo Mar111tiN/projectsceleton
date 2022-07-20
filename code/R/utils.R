@@ -23,6 +23,8 @@ config_wrapper <- function(config_file = "", ...) {
   # get args to list
   args <- list(...)
 
+  # update the config arguments with function arguments
+  args <- modifyList(config, args)
   # ### call the function
-  do.call(combined_plot, c(config, args))
+  do.call(combined_plot, args)
 }
