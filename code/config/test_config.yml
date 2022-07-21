@@ -1,11 +1,19 @@
 ---
+paths: 
+    base_path: Dropbox/Icke/Work/DigiWest  # abs or relative to home
+    # all paths belowe are absolute paths or relative to base_path
+    data_path: data
+    output_path: output
+    info_path: info
+    img_path: output/img
+    tables_path: output/tables
 load_and_save:  # here are the configs for the "load_and_save function"
-  verbose: False
-  read_lines: 0
+    verbose: False
+    read_lines: 0
 simple_message:
-  run: True
-  data:
-    - 23
-    - 40
-    - 50
-  message: Hello
+    run: True
+    data:
+        - 23
+        - 40
+        - 50
+    message: Hello

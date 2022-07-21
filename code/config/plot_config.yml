@@ -9,10 +9,10 @@ text.size: 10
 stat.label: Fold increase to w/o
 qPCR.label: mRNA relative expression
 pops:
-  Tnaive: darkgray
-  Tscm: "#F9837C"
-  Tcm: "#ADAE2C"
-  Tem: "#34B8F7"
-  Temra: "#EB7AF4"
-  CD8: white
+    Tnaive: darkgray
+    Tscm: "#F9837C"
+    Tcm: "#ADAE2C"
+    Tem: "#34B8F7"
+    Temra: "#EB7AF4"
+    CD8: white
 save.dims: [8,11]

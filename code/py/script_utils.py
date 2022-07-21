@@ -33,10 +33,40 @@ def show_output(text, color="normal", multi=False, time=False, **kwargs):
     print(time + proc + text, **kwargs)
 
 
-def load_config(config_file):
+def load_config_file(config_file):
     '''
     loads a yaml_config
     '''
 
     with open(config_file, "r") as stream:
         return load(stream, Loader=Loader)
+
+
+def load_config(config_file="", *, config_path="", **kwargs):
+    '''
+    passes configs to inner functions
+    directly passed arguments overwrite config
+    '''
+
+    if config_path and not config_file.startswith("/"):
+        config_file = os.path.join(config_path, config_file)
+    if not os.path.splitext(config_file) in [".yml", "yaml"]:
+        config_file = config_file + ".yml"
+    try:
+        config = load_config_file(config_file)
+    except:
+        show_output(f"config file {config_file} could not be loaded", color="warning")
+        return {}
+
+    path_config = config['paths']
+    if not path_config['base_path'].startswith("/"):
+        path_config['base_path'] = os.path.join(os.environ['HOME'], path_config['base_path'])
+    for path in ['data', 'output', 'info', 'img', 'tables']:
+        key = f"{path}_path"
+        if not path_config[key].startswith("/"):
+            path_config[key] = os.path.join(path_config['base_path'], path_config[key])
+
+    # load in the kwargs to overwrite config
+    config.update(kwargs)
+    show_output(f"config file {config_file} successfully loaded", color="success")
+    return config
