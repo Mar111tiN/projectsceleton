@@ -1,5 +1,6 @@
 ---
 paths: 
+    code_core: ""  # has to be an absolute path to external code base
     base_path: Dropbox/Icke/Work/DigiWest  # abs or relative to home
     # all paths belowe are absolute paths or relative to base_path
     data_path: data

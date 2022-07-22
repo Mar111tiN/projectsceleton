@@ -1,4 +1,5 @@
 import os
+import sys
 from datetime import datetime as dt
 from yaml import CLoader as Loader, load
 
@@ -69,4 +70,15 @@ def load_config(config_file="", *, config_path="", **kwargs):
     # load in the kwargs to overwrite config
     config.update(kwargs)
     show_output(f"config file {config_file} successfully loaded", color="success")
+    # build the output paths
+    pc = config['paths']
+    for folder in ['output_path', 'img_path', 'tables_path']:
+        if not os.path.isdir(pc[folder]):
+            show_output(f"Creating folder {pc[folder].replace(pc['base_folder'], '')} in base folder")
+            os.makedirs(pc[folder])
+
+    if (code_base := pc['code_core']):
+        sys.path.append(code_base)
+        show_output(f"Added {code_base} to python path for imports")
+
     return config
