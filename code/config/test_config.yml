@@ -1,16 +1,17 @@
 ---
 paths: 
     code_core: ""  # has to be an absolute path to external code base
-    base_path: BCRTBioinfo/projects/skeleton  # abs or relative to work
+    base_path: Work/BCRTBioinfo/projects/skeleton  # abs or relative to HOME
     # all paths belowe are absolute paths or relative to base_path
     data_path: data
     output_path: output
     info_path: info
     img_path: output/img
     tables_path: output/tables
+    static_path: Work/static/hg38
 load_and_save:  # here are the configs for the "load_and_save function"
     verbose: False
-    read_lines: 0
+    read_lines: 10
 simple_message:
     run: True
     data:

@@ -49,19 +49,24 @@ def load_config(config_file="", *, config_path="", **kwargs):
     directly passed arguments overwrite config
     '''
 
+    # build the config_file path from config_file and config_path arguments
     if config_path and not config_file.startswith("/"):
         config_file = os.path.join(config_path, config_file)
-    if not os.path.splitext(config_file) in [".yml", "yaml"]:
+    if not os.path.splitext(config_file)[-1] in [".yml", "yaml"]:
         config_file = config_file + ".yml"
+    # savely load the config file into config dict
     try:
         config = load_config_file(config_file)
     except:
         show_output(f"config file {config_file} could not be loaded", color="warning")
         return {}
 
+    # build base_path relative to HOME path
     path_config = config['paths']
     if not path_config['base_path'].startswith("/"):
         path_config['base_path'] = os.path.join(os.environ['HOME'], path_config['base_path'])
+    
+    # build other paths relative to base_path
     for path in ['data', 'output', 'info', 'img', 'tables']:
         key = f"{path}_path"
         if not path_config[key].startswith("/"):
@@ -74,7 +79,7 @@ def load_config(config_file="", *, config_path="", **kwargs):
     pc = config['paths']
     for folder in ['output_path', 'img_path', 'tables_path']:
         if not os.path.isdir(pc[folder]):
-            show_output(f"Creating folder {pc[folder].replace(pc['base_folder'], '')} in base folder")
+            show_output(f"Creating folder {pc[folder].replace(pc['base_path'], '')} in base folder")
             os.makedirs(pc[folder])
 
     if (code_base := pc['code_core']):

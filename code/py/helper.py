@@ -2,7 +2,7 @@ import pandas as pd
 
 from script_utils import show_output, load_config
 
-def load_and_save(file, output_excel="", verbose=False, read_lines = -1, **kwargs):
+def load_and_save(file, output="", verbose=False, read_lines = -1, **kwargs):
     '''
     testing that all paths are working
     '''
@@ -17,9 +17,9 @@ def load_and_save(file, output_excel="", verbose=False, read_lines = -1, **kwarg
         for i, col in enumerate(df.columns):
             show_output(f"Detected column{i}: {col}", color="time")
     show_output(f"Detected {len(df.index)} data entries", color="warning")
-    if output_excel:
-        df.to_csv(output_excel, sep=",", index=False)
-        show_output(f"Converted  to csv and saved as csv to {output_excel}", color="success")
+    if output:
+        df.to_csv(output, sep=",", index=False)
+        show_output(f"Converted  to csv and saved as csv to {output}", color="success")
     return df
 
 
@@ -47,10 +47,14 @@ def config_wrapper(*args, config_file="", **kwargs):
 
     LaS_config = config['load_and_save']
 
+    show_output("\n <<<Wrapper running \"load_and_save\">>>\n")
     # load in the kwargs to overwrite config
     LaS_config.update(kwargs)
+
+    # 
     df = load_and_save(*args, **LaS_config)
 
+    show_output("\n <<<Wrapper running \"simple_message\">>>\n")
     sm_config = config['simple_message']
     sm_config.update(kwargs)
     simple_message(**sm_config)
