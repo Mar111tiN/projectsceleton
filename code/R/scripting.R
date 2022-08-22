@@ -1,17 +1,17 @@
 # load the home path
 # Sys.getenv loads environment variables
 home_path <- Sys.getenv('HOME')
-
+work_path <- Sys.getenv("WORK")
 # compose the base_path from path relative to home
 # !!!!! you have to set this to the root path of the sceleton folder
 # or however you have renamed it to
 # can also be absolute path without str_glue
-base_path <- file.path(home_path, "Sites/tuto/sceleton")
+base_path <- file.path(home_path, "sceleton")
 
 # this loads the code from setup.R that auto-sets the paths that are
 # ..fixed relative to the base_folder (can be adjusted to your structure)
 # if you stick to the folder structure, you can leave it as-is
-setwd(base_path)
+
 source("code/R/setup.R")
 
 ### here you can load the code that you:
@@ -26,8 +26,6 @@ source(file.path(R_path, "utils.R"))
 stat.file <- file.path(data_path, "stat3.csv")
 qPCR_file <- file.path(data_path, "qPCR.csv")
 pdf.file <- file.path(img_path, "test_figure.pdf")
-
-stat.func
 
 #### the function combined_plot is loaded from plot.R
 # it has a lot of settings that you can play with
@@ -57,7 +55,8 @@ combined_plot(
 config.default <- file.path(config_path, "plot_config.yml")
 
 config_wrapper(
-  stat.file, qPCR_file,
+  stat.file = stat.file,
+  qPCR_file = qPCR_file,
   save.fig = pdf.file,
   qPCR.isoform = "alt",  # "A", "B" or "alt"
   stim.time = 30,  # 5,15, 30, 60
@@ -69,11 +68,9 @@ config_wrapper(
 config.gray <- file.path(config_path, "plot_config_gray.yml")
 
 
-config_test(config.default)
-
-
 config_wrapper(
-  stat.file, qPCR_file,
+  stat.file = stat.file,
+  qPCR_file = qPCR_file,
   save.fig = pdf.file,
   qPCR.isoform = "alt",
   stim.time = 30,  # 5,15, 30, 60

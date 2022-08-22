@@ -1,5 +1,7 @@
 ---
 box.width:  0.8
+boxplot.type: 5
+boxplotp.probs: [0.1, 0.25, 0.75, .9]
 alpha: 0.7
 jitter.width: 0.1
 point.size: 1.8
@@ -7,10 +9,10 @@ text.size: 10
 stat.label: Fold increase to w/o
 qPCR.label: mRNA relative expression
 pops:
-  Tnaive: darkgray
-  Tscm: "#C00000"
-  Tcm: darkgray
-  Tem: darkgray
-  Temra: darkgray
-  CD8: white
+    Tnaive: darkgray
+    Tscm: "#C00000"
+    Tcm: darkgray
+    Tem: darkgray
+    Temra: darkgray
+    CD8: white
 save.dims: [8,11]

@@ -1,7 +1,7 @@
 ---
 paths: 
     code_core: ""  # has to be an absolute path to external code base
-    base_path: Dropbox/Icke/Work/DigiWest  # abs or relative to home
+    base_path: BCRTBioinfo/projects/skeleton  # abs or relative to work
     # all paths belowe are absolute paths or relative to base_path
     data_path: data
     output_path: output
