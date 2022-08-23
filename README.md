@@ -63,7 +63,7 @@
    * create conda environment to run rstudio from:
       + `conda env create -n your-R-env -f code/env/R-env_Intel64.yml`
    * for AppleSilicon you have to transpile the Intel64-build via Rosetta as such:
-      + `CONDA_SUBDIR=osx-64 conda env create -n your-R-env -f code/env/py-env_OSX_intel64.yml`
+      + `CONDA_SUBDIR=osx-64 conda env create -n your-R-env -f code/env/R-env_OSX_intel64.yml`
       + then you should fix the CONDA_SUBDIR env: `conda activate your-R-env && conda env config vars set CONDA_SUBDIR=osx-64 && conda deactivate` 
    * for Windows/Linux, create an environment from scratch:
       + `conda create -n your-R-env r-tidyverse rstudio`
