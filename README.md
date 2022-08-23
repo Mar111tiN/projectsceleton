@@ -48,7 +48,7 @@
 * ### setup for python
    * create conda environment to run the notebooks:
       + `conda env create -n your-py-env -f code/env/py-env_OSX_intel64.yml`
-   * for AppleSilicon you have to use the arm-build from `py-env_OSX_intel64.yml` OR transpile the Intel64-build via Rosetta as such:
+   * for AppleSilicon you have to use the arm-build from `py-env_OSX_arm64.yml` OR transpile the Intel64-build via Rosetta as such:
       + `CONDA_SUBDIR=osx-64 conda env create -n your-py-env -f code/env/py-env_OSX_intel64.yml`
       + then you can fix the CONDA_SUBDIR env: `conda activate your-py-env && conda env config vars set CONDA_SUBDIR=osx-64 && conda deactivate`
    * for Windows/Linux, create an environment from scratch:
