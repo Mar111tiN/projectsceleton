@@ -157,8 +157,7 @@ def get_path(path, file_type="file", config={}):
     if not (file_path := pc[path]):
         show_output("Please provide a {file_type} in the configs", color="warning")
         return
-    if not (file_path := pc[path]).startswith("/"):
-        file_path = os.path.join(os.environ['HOME'], pc[path])
+    file_path = full_path(pc[path], base_folder=os.environ['HOME'])
         
     if os.path.isfile(file_path):
         return file_path
