@@ -81,19 +81,28 @@ def load_config_file(config_file):
         return load(stream, Loader=Loader)
 
 
+def full_path(path, base_folder=os.environ['HOME']):
+    '''
+    extends any path with the base_folder if it is not a full path or starts with "."
+    '''
+    if path[0] in ["/", "."]:
+        return path
+    return os.path.join(base_folder,path)
+
+
 def load_config(config_file="", *, config_path="", **kwargs):
     '''
     passes configs to inner functions
     directly passed arguments overwrite config
     '''
-
-    # build the config_file path from config_file and config_path arguments
+    
     # build the config_file path from config_file and config_path arguments
     if config_path and not config_file.startswith("/"):
-        config_file = os.path.join(config_path, config_file)
+        config_file = full_path(os.path.join(config_path, config_file))
+
     if not os.path.splitext(config_file)[-1] in [".yml", "yaml"]:
         config_file = config_file + ".yml"
-    # savely load the config file into config dict
+
     # savely load the config file into config dict
     try:
         config = load_config_file(config_file)
@@ -102,19 +111,14 @@ def load_config(config_file="", *, config_path="", **kwargs):
         return {}
 
     # build base_path relative to HOME path
-    # build base_path relative to HOME path
     path_config = config['paths']
-    if not path_config['base_path'].startswith("/"):
-        path_config['base_path'] = os.path.join(os.environ['HOME'], path_config['base_path'])
-    
-    # build other paths relative to base_path
-    
+    path_config['base_path'] = full_path(path_config['base_path'])
+    print(path_config['base_path'])
     # build other paths relative to base_path
     for path in ['data', 'output', 'info', 'img', 'tables']:
         key = f"{path}_path"
         if key in path_config:
-            if not path_config[key].startswith("/"):
-                path_config[key] = os.path.join(path_config['base_path'], path_config[key])
+            path_config[key] = full_path(path_config[key], base_folder=path_config['base_path'])
 
     # load in the kwargs to overwrite config
     config.update(kwargs)
@@ -123,6 +127,7 @@ def load_config(config_file="", *, config_path="", **kwargs):
     pc = config['paths']
     for folder in ['output_path', 'img_path', 'tables_path']:
         if folder in pc:
+            print(pc[folder])
             if not os.path.isdir(pc[folder]):
                 show_output(f"Creating folder {pc[folder].replace(pc['base_path'], '')} in base folder")
                 os.makedirs(pc[folder])
@@ -135,8 +140,7 @@ def load_config(config_file="", *, config_path="", **kwargs):
         for code_base in code_base_list:
             if code_base.endswith('/R'):
                 continue
-            if not code_base.startswith("/"):
-                code_base = os.path.join(os.environ['HOME'], code_base)
+            code_base = full_path(code_base)
             sys.path.append(code_base)
             show_output(f"Added {code_base} to python path for imports")
 
