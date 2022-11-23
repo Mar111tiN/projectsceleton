@@ -113,7 +113,7 @@ def load_config(config_file="", *, config_path="", **kwargs):
     # build base_path relative to HOME path
     path_config = config['paths']
     path_config['base_path'] = full_path(path_config['base_path'])
-    print(path_config['base_path'])
+
     # build other paths relative to base_path
     for path in ['data', 'output', 'info', 'img', 'tables']:
         key = f"{path}_path"
@@ -127,7 +127,6 @@ def load_config(config_file="", *, config_path="", **kwargs):
     pc = config['paths']
     for folder in ['output_path', 'img_path', 'tables_path']:
         if folder in pc:
-            print(pc[folder])
             if not os.path.isdir(pc[folder]):
                 show_output(f"Creating folder {pc[folder].replace(pc['base_path'], '')} in base folder")
                 os.makedirs(pc[folder])
