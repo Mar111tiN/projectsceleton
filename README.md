@@ -47,12 +47,12 @@
 
 * ### setup for python
    * create conda environment to run the notebooks:
-      + `conda env create -n your-py-env-f code/env/py-env_Intel64.yml`
-   * for AppleSilicon you have to use the Intel64-build via Rosetta:
-      + `CONDA_SUBDIR=osx-64 conda env create -n your-py-env -f code/env/py-env_M1.yml`
-      + then you can fix the CONDA_SUBDIR env: `conda activate your-py-env && conda env config vars set CONDA_SUBDIR=osx-64`
+      + `conda env create -n your-py-env -f code/env/py-env_OSX_intel64.yml`
+   * for AppleSilicon you have to use the arm-build from `py-env_OSX_arm64.yml` OR transpile the Intel64-build via Rosetta as such:
+      + `CONDA_SUBDIR=osx-64 conda env create -n your-py-env -f code/env/py-env_OSX_intel64.yml`
+      + then you can fix the CONDA_SUBDIR env: `conda activate your-py-env && conda env config vars set CONDA_SUBDIR=osx-64 && conda deactivate`
    * for Windows/Linux, create an environment from scratch:
-      + `conda create -n your-py-env python=3.10 pandas jupyter pyyaml`
+      + `conda create -n your-py-env python=3.10 pandas jupyter pyyaml openpyxl`
 
       + `rm -rf .git && cd code && git init`
    * start the environment and run the jupyter notebook and run the template.ipynb (code/nb/template.ipynb)
@@ -61,9 +61,13 @@
 * ### setup for R
    * works out of the box with simple tidyverse or you could...
    * create conda environment to run rstudio from:
-      + `conda env create -n your-R-env -f code/env/py-env_Intel64.yml`
+      + `conda env create -n your-R-env -f code/env/R-env_Intel64.yml`
+   * for AppleSilicon you have to transpile the Intel64-build via Rosetta as such:
+      + `CONDA_SUBDIR=osx-64 conda env create -n your-R-env -f code/env/R-env_OSX_intel64.yml`
+      + then you should fix the CONDA_SUBDIR env: `conda activate your-R-env && conda env config vars set CONDA_SUBDIR=osx-64 && conda deactivate` 
    * for Windows/Linux, create an environment from scratch:
       + `conda create -n your-R-env r-tidyverse rstudio`
-   * start the environment and run `scripting.R` (code/R/scripting.R) from rstudio
+   * start the environment and start rstudio from the command line:
       + `conda activate your-R-env && rstudio`
-   * most explanations are in the code comments 
+   * open `scripting.R` (code/R/scripting.R) from rstudio
+   * explanations are in the code comments 

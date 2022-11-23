@@ -109,7 +109,8 @@ qPCR_plot <- function(qPCR.df,
 combined_plot <- function(
     ####### ARGS ###########
     # setting lots of default arguments here
-    stat.file, qPCR_file,
+    stat.file = "", 
+    qPCR_file = "",
     save.fig = "",
     save.dims = c(8, 11),
     stat.label = "STAT",
