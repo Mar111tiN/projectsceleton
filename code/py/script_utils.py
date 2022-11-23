@@ -91,7 +91,7 @@ def load_config(config_file="", *, config_path="", **kwargs):
     # build the config_file path from config_file and config_path arguments
     if config_path and not config_file.startswith("/"):
         config_file = os.path.join(config_path, config_file)
-    if not os.path.splitext(config_file)[-1][-1] in [".yml", "yaml"]:
+    if not os.path.splitext(config_file)[-1] in [".yml", "yaml"]:
         config_file = config_file + ".yml"
     # savely load the config file into config dict
     # savely load the config file into config dict
