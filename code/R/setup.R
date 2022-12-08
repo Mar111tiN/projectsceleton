@@ -30,22 +30,22 @@ load_config <- function(config_file = "", ...) {
   }
 
   data_path <<- paths$data_path
-  if (!startsWith(base_path, "/")) {
+  if (!startsWith(data_path, "/")) {
     data_path <<- file.path(base_path, data_path)
   }
 
   output_path <<- paths$output_path
-  if (!startsWith(base_path, "/")) {
+  if (!startsWith(output_path, "/")) {
     output_path <<- file.path(base_path, output_path)
   }
 
   tables_path <<- paths$tables_path
-  if (!startsWith(base_path, "/")) {
+  if (!startsWith(tables_path, "/")) {
     tables_path <<- file.path(base_path, tables_path)
   }
 
   img_path <- paths$img_path
-  if (!startsWith(base_path, "/")) {
+  if (!startsWith(img_path, "/")) {
     img_path <<- file.path(base_path, img_path)
   }
 
