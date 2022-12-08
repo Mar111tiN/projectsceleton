@@ -39,6 +39,11 @@ load_config <- function(config_file = "", ...) {
     output_path <<- file.path(base_path, output_path)
   }
 
+  config_path <<- paths$config_path
+  if (!startsWith(config_path, "/")) {
+    output_path <<- file.path(base_path, output_path)
+  }
+
   tables_path <<- paths$tables_path
   if (!startsWith(tables_path, "/")) {
     tables_path <<- file.path(base_path, tables_path)
