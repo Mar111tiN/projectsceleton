@@ -147,6 +147,7 @@ def load_config(config_file="", *, config_path="", **kwargs):
             code_base = full_path(code_base)
             sys.path.append(code_base)
             show_output(f"Added {code_base} to python path for imports")
+        del pc['py_core']
     # add hook to mawk/shell tools
     if (mawk_path := pc.get('shell_core', "")):
         if isinstance(mawk_path, list):
@@ -155,6 +156,7 @@ def load_config(config_file="", *, config_path="", **kwargs):
                 return config
         pc['shell'] = full_path(mawk_path)
         show_output(f"Added shell path {mawk_path} to configs")
+        del pc['shell_core']
     return config
 
 
