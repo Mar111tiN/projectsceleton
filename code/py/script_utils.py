@@ -95,7 +95,7 @@ def load_config(config_file="", *, config_path="", **kwargs):
     passes configs to inner functions
     directly passed arguments overwrite config
     '''
-    
+    ######## LOAD THE CONFIG ####################
     # build the config_file path from config_file and config_path arguments
     if config_path and not config_file.startswith("/"):
         config_file = full_path(os.path.join(config_path, config_file))
@@ -109,13 +109,18 @@ def load_config(config_file="", *, config_path="", **kwargs):
     except:
         show_output(f"config file {config_file} could not be loaded", color="warning")
         return {}
-
-    # build base_path relative to HOME path
+    ######### EXTERNAL PATHS ###################
+    # build base_path and other external paths relative to HOME path
     path_config = config['paths']
+    for path in ['data', 'static']:
+        key = f"{path}_path"
+        if key in path_config:
+            path_config[key] = full_path(path_config[key])
+
     path_config['base_path'] = full_path(path_config['base_path'])
 
     # build other paths relative to base_path
-    for path in ['data', 'output', 'info', 'img', 'tables']:
+    for path in ['output', 'info', 'img', 'tables']:
         key = f"{path}_path"
         if key in path_config:
             path_config[key] = full_path(path_config[key], base_folder=path_config['base_path'])
@@ -131,8 +136,8 @@ def load_config(config_file="", *, config_path="", **kwargs):
                 show_output(f"Creating folder {pc[folder].replace(pc['base_path'], '')} in base folder")
                 os.makedirs(pc[folder])
 
-    # add external code bases
-    if (code_base_list := pc.get('code_core', "")):
+    # add external code base
+    if (code_base_list := pc.get('py_core', "")):
         # convert code_base to list if only one string is given
         if isinstance(code_base_list, str):
             code_base_list = [code_base_list]
@@ -142,7 +147,14 @@ def load_config(config_file="", *, config_path="", **kwargs):
             code_base = full_path(code_base)
             sys.path.append(code_base)
             show_output(f"Added {code_base} to python path for imports")
-
+    # add hook to mawk/shell tools
+    if (mawk_path := pc.get('shell_core', "")):
+        if isinstance(mawk_path, list):
+            mawk_path = mawk_path[0]
+        if mawk_path.endswith('/R') or mawk_path.endswith('/py'):
+                return config
+        pc['shell'] = full_path(mawk_path)
+        show_output(f"Added shell path {mawk_path} to configs")
     return config
 
 
