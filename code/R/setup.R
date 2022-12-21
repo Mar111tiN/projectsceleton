@@ -54,13 +54,13 @@ load_config <- function(config_file = "", ...) {
     img_path <<- file.path(base_path, img_path)
   }
 
-  for (path in names(paths$R_paths)) {
+  for (path in names(paths$R_core)) {
     if (!startsWith(path, "/")) {
       R_path <<- file.path(home, path)
     } else {
       R_path <<- path
     }
-    for (file in paths$R_paths[[path]]) {
+    for (file in paths$R_core[[path]]) {
       R_file <- file.path(R_path, file)
       print(str_glue("Loading data from {R_file}"))
       source(R_file)
