@@ -137,7 +137,8 @@ def load_config(config_file="", *, config_path="", **kwargs):
                 os.makedirs(pc[folder])
 
     # add external code base
-    if (code_base_list := pc.get('py_core', "")):
+    cc = config['code']
+    if (code_base_list := cc.get('py_core', "")):
         # convert code_base to list if only one string is given
         if isinstance(code_base_list, str):
             code_base_list = [code_base_list]
@@ -147,16 +148,16 @@ def load_config(config_file="", *, config_path="", **kwargs):
             code_base = full_path(code_base)
             sys.path.append(code_base)
             show_output(f"Added {code_base} to python path for imports")
-        del pc['py_core']
+        del cc['py_core']
     # add hook to mawk/shell tools
-    if (mawk_path := pc.get('shell_core', "")):
+    if (mawk_path := cc.get('shell_core', "")):
         if isinstance(mawk_path, list):
             mawk_path = mawk_path[0]
         if mawk_path.endswith('/R') or mawk_path.endswith('/py'):
                 return config
-        pc['shell'] = full_path(mawk_path)
+        cc['shell'] = full_path(mawk_path)
         show_output(f"Added shell path {mawk_path} to configs")
-        del pc['shell_core']
+        del cc['shell_core']
     return config
 
 
