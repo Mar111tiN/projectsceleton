@@ -130,7 +130,7 @@ def load_config(config_file="", *, config_path="", **kwargs):
     show_output(f"config file {config_file} successfully loaded", color="success")
     # build the output paths
     pc = config['paths']
-    for folder in ['output_path', 'img_path', 'tables_path']:
+    for folder in ['output_path', 'img_path', 'tables_path', 'data_path']:
         if folder in pc:
             if not os.path.isdir(pc[folder]):
                 show_output(f"Creating folder {pc[folder].replace(pc['base_path'], '')} in base folder")
@@ -149,6 +149,21 @@ def load_config(config_file="", *, config_path="", **kwargs):
             sys.path.append(code_base)
             show_output(f"Added {code_base} to python path for imports")
         del cc['py_core']
+
+    # add additional configs
+    for c in config.get('configs',""):
+        # no loop if there is no configs entry
+        if not c:
+            break
+        config_file_added = full_path(config['configs'][c], base_folder=path_config['base_path'])
+        try:
+            config2add = load_config_file(config_file_added)
+            show_output(f"Loading additional config {c} from {config['configs'][c]}")
+            config.update(config2add)
+        except:
+            show_output(f"config file {config_file_added} could not be loaded", color="warning")
+    config.pop("configs", None)
+
     # add hook to mawk/shell tools
     if (mawk_path := cc.get('shell_core', "")):
         if isinstance(mawk_path, list):
