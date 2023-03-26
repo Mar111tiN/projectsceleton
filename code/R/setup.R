@@ -31,7 +31,7 @@ load_config <- function(config_file = "", ...) {
 
   # load the config file
   config <- read_yaml(config_file)
-
+  
   ### SET PATHS
   paths <- config$paths
   # create the path variables globally (<<- creates global variables)

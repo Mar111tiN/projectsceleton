@@ -3,9 +3,10 @@ code:
     py_core:
         - Sites/Bio/ebscore/code/py  # has to be an absolute path to external code base
     R_core: # 
-        Sites/Bio/digiwest/code/R
-    shell_core:
-        - Sites/Bio/ebscore/shell
+        Sites/projectsceleton/code/R:
+            - config_decorate.R
+    # shell_core:
+    #     - Sites/Bio/ebscore/shell
     threads: 6
     java:
         mem: 8g
