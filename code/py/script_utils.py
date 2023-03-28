@@ -90,7 +90,7 @@ def full_path(path, base_folder=os.environ['HOME']):
     return os.path.join(base_folder,path)
 
 
-def load_config(config_file="", *, config_path="", **kwargs):
+def setup_config(config_file="", *, config_path="", **kwargs):
     '''
     passes configs to inner functions
     directly passed arguments overwrite config
@@ -110,30 +110,28 @@ def load_config(config_file="", *, config_path="", **kwargs):
         show_output(f"config file {config_file} could not be loaded", color="warning")
         return {}
     ######### EXTERNAL PATHS ###################
-    # build base_path and other external paths relative to HOME path
+    # build base and other external paths relative to HOME path
     path_config = config['paths']
-    for path in ['data', 'static']:
-        key = f"{path}_path"
-        if key in path_config:
-            path_config[key] = full_path(path_config[key])
+    for path_key in ['data', 'static']:
+        if path_key in path_config:
+            path_config[path_key] = full_path(path_config[path_key])
 
-    path_config['base_path'] = full_path(path_config['base_path'])
+    path_config['base'] = full_path(path_config['base'])
 
-    # build other paths relative to base_path
-    for path in ['output', 'info', 'img', 'tables']:
-        key = f"{path}_path"
-        if key in path_config:
-            path_config[key] = full_path(path_config[key], base_folder=path_config['base_path'])
+    # build other paths relative to base path
+    for path_key in path_config:
+        if path_key in path_config and not path_key == "base":
+            path_config[path_key] = full_path(path_config[path_key], base_folder=path_config['base'])
 
     # load in the kwargs to overwrite config
     config.update(kwargs)
     show_output(f"config file {config_file} successfully loaded", color="success")
     # build the output paths
     pc = config['paths']
-    for folder in ['output_path', 'img_path', 'tables_path', 'data_path']:
+    for folder in ['output', 'img', 'tables', 'html']:
         if folder in pc:
             if not os.path.isdir(pc[folder]):
-                show_output(f"Creating folder {pc[folder].replace(pc['base_path'], '')} in base folder")
+                show_output(f"Creating folder {pc[folder].replace(pc['base'], '')} in base folder")
                 os.makedirs(pc[folder])
 
     # add external code base
@@ -155,7 +153,7 @@ def load_config(config_file="", *, config_path="", **kwargs):
         # no loop if there is no configs entry
         if not c:
             break
-        config_file_added = full_path(config['configs'][c], base_folder=path_config['base_path'])
+        config_file_added = full_path(config['configs'][c], base_folder=path_config['base'])
         try:
             config2add = load_config_file(config_file_added)
             show_output(f"Loading additional config {c} from {config['configs'][c]}")
