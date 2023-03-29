@@ -72,14 +72,7 @@ def cmd2df(cmd, show=False, **kwargs):
     return cmd_df
 
 
-def load_config_file(config_file):
-    '''
-    loads a yaml_config
-    '''
-
-    with open(config_file, "r") as stream:
-        return load(stream, Loader=Loader)
-
+############ PATH HELPER #######################################################
 
 def full_path(path, base_folder=os.environ['HOME']):
     '''
@@ -90,42 +83,79 @@ def full_path(path, base_folder=os.environ['HOME']):
     return os.path.join(base_folder,path)
 
 
+def get_path(path, file_type="file", config={}, base_folder=os.environ['HOME']):
+    '''
+    retrieves a path value from the given key in the config and does some checks
+    '''
+    pc = config['paths']
+    if not path in pc:
+        show_output(f"Please provide a path for the {file_type} in the configs @{path}!", color="warning")
+        return
+    if not (file_path := pc[path]):
+        show_output("Please provide a {file_type} in the configs", color="warning")
+        return
+    file_path = full_path(pc[path], base_folder=base_folder)
+        
+    if os.path.isfile(file_path):
+        return file_path
+    else:
+        show_output(f"{file_type} {file_path} cannot be found!", color="warning")
+        return
+
+
+############ CONFIG LOADER #######################################################
+def load_config_file(config_file, config_path="", base_path=""):
+    '''
+    loads a yaml_config
+    '''
+
+    # build the config_file path from config_file and config_path arguments
+    if config_path and not config_file.startswith("/"):
+        config_file = full_path(os.path.join(config_path, config_file))
+
+    # add the extension if needed
+    if not os.path.splitext(config_file)[-1] in [".yml", "yaml"]:
+        config_file = config_file + ".yml"
+
+    with open(config_file, "r") as stream:
+        config = load(stream, Loader=Loader)
+        ######### EXTERNAL PATHS ###################
+    # build base and other external paths relative to HOME path
+    path_config = config['paths']
+    for path_key in ['data', 'static']:
+        if path_key in path_config:
+            path_config[path_key] = full_path(path_config[path_key])
+    if not base_path:
+        path_config['base'] = base_path = full_path(path_config['base'])
+
+    # build other paths relative to base path
+    for path_key in path_config:
+        if path_key in path_config and not path_key == "base":
+            path_config[path_key] = full_path(path_config[path_key], base_folder=base_path)
+
+    return config
+
+
 def setup_config(config_file="", *, config_path="", **kwargs):
     '''
     passes configs to inner functions
     directly passed arguments overwrite config
     '''
     ######## LOAD THE CONFIG ####################
-    # build the config_file path from config_file and config_path arguments
-    if config_path and not config_file.startswith("/"):
-        config_file = full_path(os.path.join(config_path, config_file))
 
-    if not os.path.splitext(config_file)[-1] in [".yml", "yaml"]:
-        config_file = config_file + ".yml"
 
     # savely load the config file into config dict
     try:
-        config = load_config_file(config_file)
+        config = load_config_file(config_file, config_path)
     except:
         show_output(f"config file {config_file} could not be loaded", color="warning")
         return {}
-    ######### EXTERNAL PATHS ###################
-    # build base and other external paths relative to HOME path
-    path_config = config['paths']
-    for path_key in ['data', 'static']:
-        if path_key in path_config:
-            path_config[path_key] = full_path(path_config[path_key])
 
-    path_config['base'] = full_path(path_config['base'])
-
-    # build other paths relative to base path
-    for path_key in path_config:
-        if path_key in path_config and not path_key == "base":
-            path_config[path_key] = full_path(path_config[path_key], base_folder=path_config['base'])
-
+    show_output(f"config file {config_file} successfully loaded", color="success")
     # load in the kwargs to overwrite config
     config.update(kwargs)
-    show_output(f"config file {config_file} successfully loaded", color="success")
+    
+    
     # build the output paths
     pc = config['paths']
     for folder in ['output', 'img', 'tables', 'html']:
@@ -149,17 +179,16 @@ def setup_config(config_file="", *, config_path="", **kwargs):
         del cc['py_core']
 
     # add additional configs
-    for c in config.get('configs',""):
+    for config_name in config.get('configs',""):
         # no loop if there is no configs entry
-        if not c:
+        if not config_name:
             break
-        config_file_added = full_path(config['configs'][c], base_folder=path_config['base'])
-        try:
-            config2add = load_config_file(config_file_added)
-            show_output(f"Loading additional config {c} from {config['configs'][c]}")
-            config.update(config2add)
-        except:
-            show_output(f"config file {config_file_added} could not be loaded", color="warning")
+        # try:
+        config2add = load_config_file(config['configs'][config_name], config_path=config['paths']['config'], base_path=config['paths']['base'])
+        show_output(f"Loading additional config {config_name} from {config_name}")
+        config.update({config_name:config2add})
+        # except:
+        #     show_output(f"Additional config file {os.path.basename(config_file_added)} could not be loaded", color="warning")
     config.pop("configs", None)
 
     # add hook to mawk/shell tools
@@ -172,23 +201,3 @@ def setup_config(config_file="", *, config_path="", **kwargs):
         show_output(f"Added shell path {mawk_path} to configs")
         del cc['shell_core']
     return config
-
-
-def get_path(path, file_type="file", config={}):
-    '''
-    retrieves a path value from the given key in the config and does some checks
-    '''
-    pc = config['paths']
-    if not path in pc:
-        show_output(f"Please provide a path for the {file_type} in the configs @{path}!", color="warning")
-        return
-    if not (file_path := pc[path]):
-        show_output("Please provide a {file_type} in the configs", color="warning")
-        return
-    file_path = full_path(pc[path], base_folder=os.environ['HOME'])
-        
-    if os.path.isfile(file_path):
-        return file_path
-    else:
-        show_output(f"{file_type} {file_path} cannot be found!", color="warning")
-        return
