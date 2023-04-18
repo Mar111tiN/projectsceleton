@@ -34,35 +34,64 @@ load_config <- function(config_file = "", ...) {
   
   ### SET PATHS
   paths <- config$paths
+
   # create the path variables globally (<<- creates global variables)
-  base_path <<- paths$base_path
+  base_path <<- paths$base
   if (!startsWith(base_path, "/")) {
     base_path <<- file.path(home, base_path)
+    print(base_path)
   }
 
-  data_path <<- paths$data_path
+  ######## CREATE ALL THE PATH VARIABLES AND FOLDER (IF NOT EXISTING)
+  data_path <<- paths$data
   if (!startsWith(data_path, "/")) {
     data_path <<- file.path(base_path, data_path)
+    if (!dir.exists(data_path)) {
+      dir.create(data_path)
+    }
   }
 
-  output_path <<- paths$output_path
-  if (!startsWith(output_path, "/")) {
-    output_path <<- file.path(base_path, output_path)
+  results_path <<- paths$results
+  if (!startsWith(results_path, "/")) {
+    results_path <<- file.path(base_path, results_path)
+    if (!dir.exists(results_path)) {
+      dir.create(results_path)
+    }
   }
 
-  config_path <<- paths$config_path
+  config_path <<- paths$config
   if (!startsWith(config_path, "/")) {
     config_path <<- file.path(base_path, config_path)
+    if (!dir.exists(config_path)) {
+      dir.create(config_path)
+    }
   }
 
-  tables_path <<- paths$tables_path
+  tables_path <<- paths$tables
   if (!startsWith(tables_path, "/")) {
+    tables_path <- file.path(base_path, tables_path)
+    if (!dir.exists(tables_path)) {
+      dir.create(tables_path)
+    }
     tables_path <<- file.path(base_path, tables_path)
   }
 
-  img_path <- paths$img_path
+  img_path <- paths$img
   if (!startsWith(img_path, "/")) {
+    img_path <- file.path(base_path, img_path)
+    if (!dir.exists(img_path)) {
+      dir.create(img_path)
+    }
     img_path <<- file.path(base_path, img_path)
+  }
+
+  reports_path <- paths$reports
+  if (!startsWith(reports_path, "/")) {
+    reports_path <- file.path(base_path, reports_path)
+    if (!dir.exists(reports_path)) {
+      dir.create(reports_path)
+    }
+    reports_path <<- file.path(base_path, reports_path)
   }
 
   # LOAD R CODE

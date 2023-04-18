@@ -10,19 +10,26 @@ from io import StringIO
 ansii_colors = {
     "magenta": "[1;35;2m",
     "green": "[1;9;2m",
-    "red": "[1;31;1m",
+    "red": "[5;31;5m",
     "cyan": "[1;36;1m",
     "gray": "[1;30;1m",
     "black": "[0m",
+    "blue": "[34;1m",
+    "orange": "[38;5;202m",
+    "orange2": "[48;2;255;165;0m",
+    "green2": "[32m;1m"
 }
 
 colors = {
+    "info": ansii_colors["blue"],
     "process": ansii_colors["green"],
     "time": ansii_colors["magenta"],
     "normal": ansii_colors["gray"],
-    "warning": ansii_colors["red"],
-    "success": ansii_colors["cyan"],
+    "warning": ansii_colors["orange2"],
+    "error": ansii_colors["red"],
+    "success": ansii_colors["cyan"]
 }
+
 
 
 def show_output(text, color="normal", multi=False, time=False, **kwargs):
@@ -201,3 +208,80 @@ def setup_config(config_file="", *, config_path="", **kwargs):
         show_output(f"Added shell path {mawk_path} to configs")
         del cc['shell_core']
     return config
+
+
+############## EXCEL OUTPUT ######################################
+def writeExcel(df_dict={}, excel_out="", dt_format="YYYY-MM-DD", fit_cols=True, max_colwidth=50, extra_space=2):
+    '''
+    convenience function to write excel file with nicer formating
+    either pass a df or a dict with {sheetname:df}-format
+    '''
+    with pd.ExcelWriter(excel_out, datetime_format=dt_format, date_format=dt_format) as writer:
+        # check data type
+        if isinstance(df_dict, pd.DataFrame):
+            df_dict = {"Sheet1": df_dict}
+
+        if isinstance(df_dict, dict):
+            for sheetname, df in df_dict.items():
+                df.to_excel(writer, sheet_name=sheetname, index=False)
+        else:
+            show_output("df_dict (first arg) must be either dict or pd.DataFrame!", color="error")
+            return None
+        if fit_cols:
+            for sheetname, sheet in writer.sheets.items():
+                df = df_dict[sheetname]
+                for idx, col in enumerate(df):  # loop through all columns
+                    series = df[col]
+                    max_len = min(max((
+                        series.astype(str).map(len).max(),  # len of largest item
+                        len(str(series.name))  # len of column name/header
+                        )) + extra_space, max_colwidth)  # adding a little extra space
+                    _ = sheet.set_column(idx, idx, max_len)  # set column width
+
+########### IO ###################################################
+def convert2time(df, date_cols=[], f="", **kwargs):
+    '''
+    convert strings in date_cols of df to time format
+    '''
+    for col in date_cols:
+        df.loc[:, col] = pd.to_datetime(df[col], errors='coerce').dt.date
+    return df
+
+
+def convert2int(df, int_cols=[], int_default=-1, **kwargs):
+    '''
+    convert strings in cols of df to time format
+    '''
+    for col in int_cols:
+        df.loc[:, col] = df[col].fillna(int_default).astype(int)
+    return df
+
+
+def convert2str(df, str_cols=[], str_default="", **kwargs):
+    '''
+    convert strings in cols of df to time format
+    '''
+    for col in str_cols:
+        df.loc[:, col] = df[col].fillna(str_default).astype(str)
+    return df
+
+
+def convert2categorical(df, cat_cols={}, **kwargs):
+    '''
+    convert the cols to categorical columns with given order
+    '''
+    for col in cat_cols:
+        df[col] = pd.Categorical(df[col], cat_cols[col])
+    return df
+
+
+def edit_cols(df, **kwargs):
+    '''
+    format the columns in a dataframe
+    '''
+    # convert date_cols
+    df = convert2time(df, **kwargs)
+    df = convert2int(df, **kwargs)
+    df = convert2categorical(df, **kwargs)
+    df = convert2str(df, **kwargs)
+    return df
