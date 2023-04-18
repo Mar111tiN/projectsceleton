@@ -39,60 +39,32 @@ load_config <- function(config_file = "", ...) {
   base_path <<- paths$base
   if (!startsWith(base_path, "/")) {
     base_path <<- file.path(home, base_path)
-    print(base_path)
+  }
+
+  for (path in names(paths)) {
+    if (!startsWith(paths[[path]], "/")) paths[[path]] <- if_else(
+        path == "base", 
+        file.path(Sys.getenv('HOME'), paths[[path]]),
+        file.path(base_path, paths[[path]])
+    )
+    assign(str_glue("{path}_path"), paths[[path]], envir = .GlobalEnv)
   }
 
   ######## CREATE ALL THE PATH VARIABLES AND FOLDER (IF NOT EXISTING)
-  data_path <<- paths$data
-  if (!startsWith(data_path, "/")) {
-    data_path <<- file.path(base_path, data_path)
-    if (!dir.exists(data_path)) {
-      dir.create(data_path)
-    }
-  }
+    for (path in c(
+        data_path,
+        results_path,
+        config_path,
+        tables_path,
+        img_path,
+        reports_path
+    )) {
 
-  results_path <<- paths$results
-  if (!startsWith(results_path, "/")) {
-    results_path <<- file.path(base_path, results_path)
-    if (!dir.exists(results_path)) {
-      dir.create(results_path)
+      if (!dir.exists(path)) {
+        print(str_glue("Creating folder {path}"))
+            dir.create(path)
+        }
     }
-  }
-
-  config_path <<- paths$config
-  if (!startsWith(config_path, "/")) {
-    config_path <<- file.path(base_path, config_path)
-    if (!dir.exists(config_path)) {
-      dir.create(config_path)
-    }
-  }
-
-  tables_path <<- paths$tables
-  if (!startsWith(tables_path, "/")) {
-    tables_path <- file.path(base_path, tables_path)
-    if (!dir.exists(tables_path)) {
-      dir.create(tables_path)
-    }
-    tables_path <<- file.path(base_path, tables_path)
-  }
-
-  img_path <- paths$img
-  if (!startsWith(img_path, "/")) {
-    img_path <- file.path(base_path, img_path)
-    if (!dir.exists(img_path)) {
-      dir.create(img_path)
-    }
-    img_path <<- file.path(base_path, img_path)
-  }
-
-  reports_path <- paths$reports
-  if (!startsWith(reports_path, "/")) {
-    reports_path <- file.path(base_path, reports_path)
-    if (!dir.exists(reports_path)) {
-      dir.create(reports_path)
-    }
-    reports_path <<- file.path(base_path, reports_path)
-  }
 
   # LOAD R CODE
   cc <- config$code
