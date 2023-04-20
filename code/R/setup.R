@@ -16,8 +16,8 @@ library(xlsx)
 # this is not needed here
 # static_path <- Sys.getenv("STATIC")
 
-load_config <- function(config_file = "", ...) {
-  
+run_setup <- function(config_file = "", ...) {
+  home <- Sys.getenv('HOME')
   ### CHECKS
   if (config_file == "") {
     # add functionality for not finding the config file
@@ -34,20 +34,18 @@ load_config <- function(config_file = "", ...) {
   
   ### SET PATHS
   paths <- config$paths
+  # set base_path first
+    if (!startsWith(paths[['base']], "/")) paths[['base']] <- file.path(home, paths[['base']])
+    assign("base_path", paths[['base']], envir = .GlobalEnv)
 
-  # create the path variables globally (<<- creates global variables)
-  base_path <<- paths$base
-  if (!startsWith(base_path, "/")) {
-    base_path <<- file.path(home, base_path)
-  }
+
 
   for (path in names(paths)) {
-    if (!startsWith(paths[[path]], "/")) paths[[path]] <- if_else(
-        path == "base", 
-        file.path(Sys.getenv('HOME'), paths[[path]]),
-        file.path(base_path, paths[[path]])
-    )
-    assign(str_glue("{path}_path"), paths[[path]], envir = .GlobalEnv)
+    if (!(path == "base")) {
+      if (!startsWith(paths[[path]], "/")) paths[[path]] <- file.path(base_path, paths[[path]])
+      assign(str_glue("{path}_path"), paths[[path]], envir = .GlobalEnv)
+    }
+
   }
 
   ######## CREATE ALL THE PATH VARIABLES AND FOLDER (IF NOT EXISTING)
