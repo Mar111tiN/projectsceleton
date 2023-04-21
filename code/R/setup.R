@@ -66,6 +66,7 @@ run_setup <- function(config_file = "", ...) {
 
   # LOAD R CODE
   cc <- config$code
+  R_path_save <- R_path
   # go through R_core path list
   for (path in names(cc$R_core)) {
     if (!startsWith(path, "/")) {
@@ -78,6 +79,7 @@ run_setup <- function(config_file = "", ...) {
       print(str_glue("Loading data from {R_file}"))
       source(R_file)
     }
+    R_path <<- R_path_save
   }
   
   # set the threads
@@ -101,4 +103,5 @@ run_setup <- function(config_file = "", ...) {
 
   # update the config arguments with function arguments
   args <- modifyList(config, args)
+  return(config)
 }
