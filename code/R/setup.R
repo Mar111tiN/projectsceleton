@@ -8,7 +8,6 @@ library(xlsx)
 # # create the image folder, if it does not exist
 # dir.create(img_path, showWarnings = FALSE)
 # config_path <- file.path(base_path, "code/config")
-# R_path <- file.path(base_path, "code/R")
 
 
 # I import large static data like database files or human genome etc in static folder
@@ -66,7 +65,7 @@ run_setup <- function(config_file = "", ...) {
 
   # LOAD R CODE
   cc <- config$code
-  R_path_save <- R_path
+  # R_path_save <- R_path
   # go through R_core path list
   for (path in names(cc$R_core)) {
     if (!startsWith(path, "/")) {
@@ -79,7 +78,7 @@ run_setup <- function(config_file = "", ...) {
       print(str_glue("Loading data from {R_file}"))
       source(R_file)
     }
-    R_path <<- R_path_save
+    # R_path <<- R_path_save
   }
   
   # set the threads
