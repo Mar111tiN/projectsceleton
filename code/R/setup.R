@@ -125,7 +125,7 @@ load_data <- function() {
     # extend the file path  
     if (!endsWith(RData_path, ".RData")) RData_path <<- str_glue("{RData_path}.RData")
         if (file.exists(RData_path)) {
-            load(RData_path)
+            load(RData_pat, envir=.GlobalEnv)
             message(str_glue("Data loaded from {RData_path}"))
             return(1)
     } else return(0)
