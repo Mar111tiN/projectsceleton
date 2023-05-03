@@ -37,17 +37,31 @@ run_setup <- function(config_file = "", ...) {
     if (!startsWith(paths[['base']], "/")) paths[['base']] <- file.path(home, paths[['base']])
     assign("base_path", paths[['base']], envir = .GlobalEnv)
 
+  for (folder in names(paths)) {
+    if (folder == "base") next
 
-
-  for (path in names(paths)) {
-    if (!(path == "base")) {
-      if (!startsWith(paths[[path]], "/")) paths[[path]] <- file.path(base_path, paths[[path]])
-      assign(str_glue("{path}_path"), paths[[path]], envir = .GlobalEnv)
+    # set the folder relative to base_path
+    root <- file.path(base_path, folder)
+    # looking for a root path to use instead of base_path/folder
+    for (file in names(paths[[folder]])) {
+        if (file == "root") root <- paths[[folder]][['root']]
     }
-
+    print(root)
+    for (path in names(paths[[folder]])) {
+        # flatten the path list into path list
+        # build paths from root
+        if (!startsWith(paths[[folder]][[path]], "/")) {
+            paths[[path]] <- file.path(root, paths[[folder]][[path]])
+        } else paths[[path]] <- paths[[folder]][[path]]
+        # create global variable
+        assign(str_glue("{path}_path"), paths[[path]], envir = .GlobalEnv)
+    }
+    # remove the nested entries
+    paths[[folder]] <- NULL
   }
+  config$paths <- paths
 
-  ######## CREATE ALL THE PATH VARIABLES AND FOLDER (IF NOT EXISTING)
+  ######## CREATE ALL FOLDERS (IF NOT EXISTING)
     for (path in c(
         data_path,
         results_path,
@@ -59,7 +73,7 @@ run_setup <- function(config_file = "", ...) {
 
       if (!dir.exists(path)) {
         print(str_glue("Creating folder {path}"))
-            dir.create(path)
+            dir.create(path, recursive=TRUE)
         }
     }
 
@@ -103,4 +117,16 @@ run_setup <- function(config_file = "", ...) {
   # update the config arguments with function arguments
   args <- modifyList(config, args)
   return(config)
+}
+
+
+load_data <- function() {
+    ### checks if RData file RData_path exits and loads it 
+    # extend the file path  
+    if (!endsWith(RData_path, ".RData")) RData_path <<- str_glue("{RData_path}.RData")
+        if (file.exists(RData_path)) {
+            load(RData_path)
+            message(str_glue("Data loaded from {RData_path}"))
+            return(1)
+    } else return(0)
 }
