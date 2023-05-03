@@ -42,11 +42,12 @@ run_setup <- function(config_file = "", ...) {
 
     # set the folder relative to base_path
     root <- file.path(base_path, folder)
+
     # looking for a root path to use instead of base_path/folder
     for (file in names(paths[[folder]])) {
         if (file == "root") root <- paths[[folder]][['root']]
     }
-    print(root)
+    assign(str_glue("{tolower(folder)}_path"), root, envir = .GlobalEnv)
     for (path in names(paths[[folder]])) {
         # flatten the path list into path list
         # build paths from root
@@ -125,7 +126,7 @@ load_data <- function() {
     # extend the file path  
     if (!endsWith(RData_path, ".RData")) RData_path <<- str_glue("{RData_path}.RData")
         if (file.exists(RData_path)) {
-            load(RData_pat, envir=.GlobalEnv)
+            load(RData_path, envir=.GlobalEnv)
             message(str_glue("Data loaded from {RData_path}"))
             return(1)
     } else return(0)
