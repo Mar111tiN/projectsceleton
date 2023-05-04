@@ -111,6 +111,31 @@ def get_path(path, file_type="file", config={}, base_folder=os.environ['HOME']):
 
 
 ############ CONFIG LOADER #######################################################
+def get_nested_path(path_dict, root="", pc={}):
+    '''
+    helper for recursive path building
+    '''
+    
+    path_names = list(path_dict.keys())
+    for name in path_names:
+        # already done
+        if name in ['base', 'static', 'root']:
+            continue
+        # check whether this is a path or a folder (substructure)
+        if isinstance(path_dict[name], str):
+            # if it is a path, set it in path config
+            pc[name] = full_path(path_dict[name], root)
+        else:
+            # a folder (substructure)
+            # look ahead for root entry
+            if 'root' in path_dict[name]:
+                subroot = path_dict[name]['root']
+            else:
+                subroot = os.path.join(root, name) 
+            get_nested_path(path_dict[name], root=subroot, pc=pc)
+            pc[name] = subroot
+            
+
 def load_config_file(config_file, config_path="", base_path=""):
     '''
     loads a yaml_config
@@ -126,20 +151,24 @@ def load_config_file(config_file, config_path="", base_path=""):
 
     with open(config_file, "r") as stream:
         config = load(stream, Loader=Loader)
+
         ######### EXTERNAL PATHS ###################
     # build base and other external paths relative to HOME path
     path_config = config['paths']
-    for path_key in ['data', 'static']:
+
+    # extend the base and static paths
+    for path_key in ['base', 'static']:
         if path_key in path_config:
             path_config[path_key] = full_path(path_config[path_key])
-    if not base_path:
-        path_config['base'] = base_path = full_path(path_config['base'])
+    
+    # overwrite the base path as config if not set
+    #     it might be set for external configs
+    path_config['base'] = base_path if base_path else full_path(path_config['base'])
+        
+    # build other paths nested relative to base path
+    get_nested_path(path_config, root=path_config['base'], pc=path_config)
 
-    # build other paths relative to base path
-    for path_key in path_config:
-        if path_key in path_config and not path_key == "base":
-            path_config[path_key] = full_path(path_config[path_key], base_folder=base_path)
-
+    config['paths'] = path_config
     return config
 
 
@@ -150,7 +179,7 @@ def setup_config(config_file="", *, config_path="", **kwargs):
     '''
     ######## LOAD THE CONFIG ####################
 
-
+    print(config_file)
     # savely load the config file into config dict
     try:
         config = load_config_file(config_file, config_path)
@@ -165,7 +194,7 @@ def setup_config(config_file="", *, config_path="", **kwargs):
     
     # build the output paths
     pc = config['paths']
-    for folder in ['output', 'img', 'tables', 'html']:
+    for folder in ['output', 'img', 'tables', 'html', 'reports', 'src', 'Rmd']:
         if folder in pc:
             if not os.path.isdir(pc[folder]):
                 show_output(f"Creating folder {pc[folder].replace(pc['base'], '')} in base folder")

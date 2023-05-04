@@ -14,6 +14,33 @@ library(xlsx)
 # I have saved path to static data as environment variable STATIC
 # this is not needed here
 # static_path <- Sys.getenv("STATIC")
+get_nested_path <- function(path_list, root="") {
+    ## recursively building full paths from a path list
+    # using list names as subfolders
+    for (name in names(path_list)) {
+        # check if entry is a subfolder (=list)
+        if (name  %in% c('base', 'static', 'root')) next
+        if (is.list(path_list[[name]])) {
+            print(name)
+            # look ahead for root in subfolder
+            if ('root'  %in% names(path_list[[name]])) {
+                subroot <- path_list[[name]][['root']]
+            } else {
+                subroot <- file.path(root, name)
+            }
+            print(subroot)
+            get_nested_path(path_list[[name]], root=subroot)
+            paths[[name]] <<- subroot
+            assign(str_glue("{tolower(name)}_path"), paths[[name]], envir = .GlobalEnv)
+        # entry is a path
+        } else {
+            paths[[name]] <<- file.path(root, path_list[[name]])
+            assign(str_glue("{name}_path"), file.path(root, path_list[[name]]), envir = .GlobalEnv)
+        }
+    }
+}
+   
+
 
 run_setup <- function(config_file = "", ...) {
   home <- Sys.getenv('HOME')
@@ -31,38 +58,20 @@ run_setup <- function(config_file = "", ...) {
   # load the config file
   config <- read_yaml(config_file)
   
+  ################################
   ### SET PATHS
-  paths <- config$paths
-  # set base_path first
-    if (!startsWith(paths[['base']], "/")) paths[['base']] <- file.path(home, paths[['base']])
-    assign("base_path", paths[['base']], envir = .GlobalEnv)
-
-  for (folder in names(paths)) {
-    if (folder == "base") next
-
-    # set the folder relative to base_path
-    root <- file.path(base_path, folder)
-
-    # looking for a root path to use instead of base_path/folder
-    for (file in names(paths[[folder]])) {
-        if (file == "root") root <- paths[[folder]][['root']]
-    }
-    assign(str_glue("{tolower(folder)}_path"), root, envir = .GlobalEnv)
-    for (path in names(paths[[folder]])) {
-        # flatten the path list into path list
-        # build paths from root
-        if (!startsWith(paths[[folder]][[path]], "/")) {
-            paths[[path]] <- file.path(root, paths[[folder]][[path]])
-        } else paths[[path]] <- paths[[folder]][[path]]
-        # create global variable
-        assign(str_glue("{path}_path"), paths[[path]], envir = .GlobalEnv)
-    }
-    # remove the nested entries
-    paths[[folder]] <- NULL
+  paths <<- config$paths
+  for (p in c('base', 'static')) {
+        # set base_path and static path first
+        if (!startsWith(paths[[p]], "/")) paths[[p]] <- file.path(home, paths[[p]])
+        assign(str_glue("{p}_path"), paths[[p]], envir = .GlobalEnv)
   }
-  config$paths <- paths
 
-  ######## CREATE ALL FOLDERS (IF NOT EXISTING)
+
+    get_nested_path(paths, root=base_path)
+    config$paths <- paths
+
+    ######## CREATE ALL FOLDERS (IF NOT EXISTING)
     for (path in c(
         data_path,
         results_path,
