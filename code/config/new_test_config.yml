@@ -1,0 +1,39 @@
+---
+code:
+    py_core:
+        - Sites/Bio/RNAseqanalysis/code/py  # has to be an absolute path to external code base
+        - Sites/Bio/MSClinSupport/code/py
+    R_core:
+        Sites/projectsceleton/code/R:
+            - config_decorate.R
+        # Sites/Bio/RNAseqanalysis/code/R:
+        #     # - rsa_plots.R
+        #     - rsa_utils.R
+        #     - load.R
+        Sites/Bio/MSClinSupport/code/R:
+            - MS_data.R
+            - MS_plots.R
+    threads: 6
+    java: # set arguments for java-based R tools
+        mem: 8g
+paths:
+    static: Library/CloudStorage/OneDrive-Bayer/STATIC
+    base: Library/CloudStorage/OneDrive-Bayer/Projects/AhR/AhRKumo  # abs or relative to home
+    Data: 
+        # root: /far_away_path # for every subfolder you can set an absolute root to be used instead of base/folder
+        Original:
+            ventana: VentanaIHC
+            covance: CovanceFlow
+            meta: AlmacNGS/meta
+        meta_derived: Derived/meta
+        RData: Derived/RData/AhR
+    Results:
+        img: img
+        tables: table
+        reports: html/MS
+    Programs:
+        config: config
+        src: src
+        Rmd: Rmd/MS
+configs: # relative to config path or absolute path
+    meta: metaData
