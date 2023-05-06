@@ -1,0 +1,262 @@
+---
+title: 'BAY2416964-AHR 20201 Expansion\n :: ASCO Figures'
+author: "Martin Szyska <martin.szyska@bayer.com>"
+date: '`r format(Sys.time(), "%d %B, %Y")`'
+output:
+  html_document:
+    dev: svg
+    df_print: paged
+    highlight: haddock
+    code_folding: hide
+    html_notebook: null
+    theme: journal
+    toc: yes
+    toc_depth: 3
+    toc_float: yes
+study: 20201-BAY2416964-AHR (s3://kumo-20201-bay2416964-ahr/20201_AhR_RNAseq/)
+---
+
+```{r include=FALSE, cache=T}
+{
+    ##################################
+    ## SETUP #########################
+
+    # Load the helper repo
+    hook <- file.path(Sys.getenv('HOME'), "Sites/projectsceleton/code/R")
+    source(file.path(hook,"setup.R"))
+
+    config_setup <- file.path(Sys.getenv('WORK'), "Projects/AhR/AhRKumo/Programs/config/AhR_setup.yml")
+    run_setup(config_setup)
+    ## --> functions and variables are loaded
+
+
+    ####### SET THE PLOTTING CONFIG
+    config_file <- file.path(config_path, "AhReport.yml")
+    #########################################################################################
+    #################### SET PLOTTING FUNCTIONS #############################################
+    ### MetaData is already prepared by pandas workflow
+    
+    options(DT.options = list(pageLength = 30))
+    plot_patient_info <- use_with_config(plot_table, config_file)
+    plot_sites1 <- use_with_config(plot_sites, config_file)
+    plot_AllSig <- use_with_config(plot_signatureAll, config_file)
+    plot_PatientSig <- use_with_config(plot_signature, config_file=config_file)
+    plot_PatientBox <- use_with_config(plotBox, config_file=config_file)
+    plotXY <- use_with_config(plot_xy, config_file=config_file)
+    plotXYside <- use_with_config(plot_xy_side, config_file=config_file)
+}
+
+###################### GET THE DATA #####################################################
+#########################################################################################
+{
+    ###################################################
+    # LOAD THE ALMAC TPM data and merge together
+    ####### GENE DATA ################
+    if (!load_data()) {
+        dataMS <- use_with_config(load_ALMAC_TPM, config_file)()
+        dataMS <- use_with_config(get_all_signatures, config_file)(data=dataMS)
+        message(str_glue("Saving data to {RData_path}"))
+        save(dataMS, file = RData_path)
+    }
+
+    # geneInfoMS <- dataMS[["geneInfo"]]
+}
+```
+```{r setup, include=FALSE} 
+knitr::opts_chunk$set(warning = FALSE, message = FALSE) 
+```
+
+# Signature plots {.tabset .tabset-pills}
+
+## Merck 18 gene signature {.tabset .tabset-pills}
+For this signature, I have a few graphical options you can choose from - just pick one combination of color, point size and I will use this for the other figures as well
+
+### Labels
+```{r echo=FALSE, message=FALSE, result=FALSE, fig.width=10, fig.height=8}
+plot_PatientBox(dataMS,
+    ycol="Merck_18Gene_IFNy"
+        )
+```
+
+### noLabels
+```{r echo=FALSE, message=FALSE, result=FALSE, fig.width=10, fig.height=8}
+plot_PatientBox(dataMS,
+    ycol="Merck_18Gene_IFNy",
+    pointLabel=""
+        )
+```
+
+
+## David CD4|CD8 signature {.tabset .tabset-pills}
+
+This is the signature you were proposing during the brainstorm. 
+It contains:
+    + CD3E
+    + CD3D
+    + CD3G
+    + CD2
+    + CD8A
+    + CD8B
+    + GZMB
+    + PRF1
+
+### Labels
+```{r echo=FALSE, message=FALSE, result=FALSE, fig.width=10, fig.height=8}
+plot_PatientBox(dataMS,
+    ycol="David_CD4CD8",
+    pointColor="AhR_Nuclear23",
+    pointLabel="AhR_Nuclear23"
+)
+```
+
+### noLabels
+```{r echo=FALSE, message=FALSE, result=FALSE, fig.width=10, fig.height=8}
+plot_PatientBox(dataMS,
+    ycol="David_CD4CD8",
+    pointColor="AhR_Nuclear23",
+    pointLabel=""
+)
+```
+
+# Correlations Merck with NuclearAhR 2+3 {.tabset .tabset-pills}
+Correlations are not visible - I only used the SCR samples of the expansion cohort
+
+## IFNy vs Nuclear23 {.tabset .tabset-pills}
+
+### with Labels
+```{r echo=FALSE, message=FALSE, result=FALSE, fig.width=12, fig.height=10}
+(plot_correl1 <- plotXY(data=dataMS,
+    filters=list(
+        PVC="SCR",
+        CancerType="LungCancer"
+    ),
+    xcol="AhR_Nuclear23",
+    xLabel="AhR Nuclear2+3",
+    ycol="Merck_18Gene_IFNy",
+    yLabel="Merck 18gene-IFNy Signature Score",
+    pointLabel="AhR_Nuclear23",
+    pointColor="AhR_Nuclear23"
+    ))
+```
+
+### no Labels
+```{r echo=FALSE, message=FALSE, result=FALSE, fig.width=12, fig.height=10}
+(plot_correl1 <- plotXY(data=dataMS,
+    filters=list(
+        PVC="SCR",
+        CancerType="LungCancer"
+    ),
+    xcol="AhR_Nuclear23",
+    xLabel="AhR Nuclear2+3",
+    ycol="Merck_18Gene_IFNy",
+    yLabel="Merck 18gene-IFNy Signature Score",
+    pointLabel="",
+    pointColor="AhR_Nuclear23"
+    ))
+```
+
+### with linReg
+```{r echo=FALSE, message=FALSE, result=FALSE, fig.width=12, fig.height=10}
+(plot_correl1 <- plotXY(data=dataMS,
+    filters=list(
+        PVC="SCR",
+        CancerType="LungCancer"
+    ),
+    xcol="AhR_Nuclear23",
+    xLabel="AhR Nuclear2+3",
+    ycol="Merck_18Gene_IFNy",
+    yLabel="Merck 18gene-IFNy Signature Score",
+    pointLabel="",
+    pointColor="AhR_Nuclear23",
+    linRegress=T,
+    linRegSE=F
+    ))
+```
+
+### with linReg + SE
+```{r echo=FALSE, message=FALSE, result=FALSE, fig.width=12, fig.height=10}
+(plot_correl1 <- plotXY(data=dataMS,
+    filters=list(
+        PVC="SCR",
+        CancerType="LungCancer"
+    ),
+    xcol="AhR_Nuclear23",
+    xLabel="AhR Nuclear2+3",
+    ycol="Merck_18Gene_IFNy",
+    yLabel="Merck 18gene-IFNy Signature Score",
+    pointLabel="",
+    pointColor="AhR_Nuclear23",
+    linRegress=T,
+    linCorrEff=5
+    ))
+```
+
+## CD4+CD8 vs Nuclear23 {.tabset .tabset-pills}
+
+### with Labels
+```{r echo=FALSE, message=FALSE, result=FALSE, fig.width=12, fig.height=10}
+(plot_correl1 <- plotXY(data=dataMS,
+    filters=list(
+        PVC="SCR",
+        CancerType="LungCancer"
+    ),
+    xcol="AhR_Nuclear23",
+    xLabel="AhR Nuclear2+3",
+    ycol="David_CD4CD8",
+    yLabel="CD4|CD8 Signature Score",
+    pointLabel="AhR_Nuclear23",
+    pointColor="AhR_Nuclear23"
+    ))
+```
+
+### no Labels
+```{r echo=FALSE, message=FALSE, result=FALSE, fig.width=12, fig.height=10}
+(plot_correl1 <- plotXY(data=dataMS,
+    filters=list(
+        PVC="SCR",
+        CancerType="LungCancer"
+    ),
+    xcol="AhR_Nuclear23",
+    xLabel="AhR Nuclear2+3",
+    ycol="David_CD4CD8",
+    yLabel="CD4|CD8 Signature Score",
+    pointLabel="",
+    pointColor="AhR_Nuclear23"
+    ))
+```
+
+### with linReg
+```{r echo=FALSE, message=FALSE, result=FALSE, fig.width=12, fig.height=10}
+(plot_correl1 <- plotXY(data=dataMS,
+    filters=list(
+        PVC="SCR",
+        CancerType="LungCancer"
+    ),
+    xcol="AhR_Nuclear23",
+    xLabel="AhR Nuclear2+3",
+    ycol="David_CD4CD8",
+    yLabel="CD4|CD8 Signature Score",
+    pointLabel="",
+    pointColor="AhR_Nuclear23",
+    linRegress=T,
+    linRegSE=F
+    ))
+```
+
+### with linReg + SE
+```{r echo=FALSE, message=FALSE, result=FALSE, fig.width=12, fig.height=10}
+(plot_correl1 <- plotXY(data=dataMS,
+    filters=list(
+        PVC="SCR",
+        CancerType="LungCancer"
+    ),
+    xcol="AhR_Nuclear23",
+    xLabel="AhR Nuclear2+3",
+    ycol="David_CD4CD8",
+    yLabel="CD4|CD8 Signature Score",
+    pointLabel="",
+    pointColor="AhR_Nuclear23",
+    linRegress=T,
+    linCorrEff=5
+    ))
+```
