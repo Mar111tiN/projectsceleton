@@ -11,13 +11,18 @@ code:
     java:
         mem: 8g
 paths:
-    data_path: data
-    static_path: Work/static/hg38
-    base_path: Dropbox/Icke/Work/LO/LOBioinfo/PanelSeq
-    output_path: output
+    static: Dropbox/Icke/Work/static/hg38  # absolute or relative to HOME
+    base: Dropbox/Icke/Work/LO/LOBioinfo/PanelSeq # absolute or relative to HOME / used as relative base for below folders
+    Data: data
+        Original: 
+            pPCR: pPCR.csv
+        RData:
+            RData/RNAseq
+    Results:
+        img: img
+        tables: table
+        reports: html
     info_path: info
-    img_path: output/img
-    tables_path: output/tables
 load_and_save:  # here are the configs for the "load_and_save function"
     verbose: False
     read_lines: 10
