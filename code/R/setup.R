@@ -57,12 +57,14 @@ run_setup <- function(config_file = "", ...) {
 
   # load the config file
   config <- read_yaml(config_file)
-  
+
   ################################
   ### SET PATHS
-  paths <<- config$paths
-  for (p in c('base', 'static')) {
+  paths <- config$paths
+
+  for (p in c("base", "static")) {
         # set base_path and static path first
+        if (!(p  %in% paths)) next
         if (!startsWith(paths[[p]], "/")) paths[[p]] <- file.path(home, paths[[p]])
         assign(str_glue("{p}_path"), paths[[p]], envir = .GlobalEnv)
   }
