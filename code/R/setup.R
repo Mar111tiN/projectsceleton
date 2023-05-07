@@ -60,16 +60,17 @@ run_setup <- function(config_file = "", ...) {
 
   ################################
   ### SET PATHS
-  paths <- config$paths
+  paths <<- config$paths
 
   for (p in c("base", "static")) {
         # set base_path and static path first
-        if (!(p  %in% paths)) next
+        if (!(p  %in% names(paths))) next
+        print(p)
         if (!startsWith(paths[[p]], "/")) paths[[p]] <- file.path(home, paths[[p]])
         assign(str_glue("{p}_path"), paths[[p]], envir = .GlobalEnv)
   }
-
-
+    print('HELLO')
+    print(base_path)
     get_nested_path(paths, root=base_path)
     config$paths <- paths
 
