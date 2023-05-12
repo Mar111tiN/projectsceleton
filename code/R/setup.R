@@ -21,14 +21,12 @@ get_nested_path <- function(path_list, root="") {
         # check if entry is a subfolder (=list)
         if (name  %in% c('base', 'static', 'root')) next
         if (is.list(path_list[[name]])) {
-            print(name)
             # look ahead for root in subfolder
             if ('root'  %in% names(path_list[[name]])) {
                 subroot <- path_list[[name]][['root']]
             } else {
                 subroot <- file.path(root, name)
             }
-            print(subroot)
             get_nested_path(path_list[[name]], root=subroot)
             paths[[name]] <<- subroot
             assign(str_glue("{tolower(name)}_path"), paths[[name]], envir = .GlobalEnv)
