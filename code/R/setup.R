@@ -23,7 +23,9 @@ get_nested_path <- function(path_list, root="") {
         if (is.list(path_list[[name]])) {
             # look ahead for root in subfolder
             if ('root'  %in% names(path_list[[name]])) {
-                subroot <- path_list[[name]][['root']]
+                root_set <- path_list[[name]][['root']]
+                if (!startsWith(root_set, "/")) root_set <- file.path(root, root_set)
+                subroot <- root_set
             } else {
                 subroot <- file.path(root, name)
             }
@@ -37,7 +39,6 @@ get_nested_path <- function(path_list, root="") {
         }
     }
 }
-   
 
 
 run_setup <- function(config_file = "", ...) {
@@ -55,16 +56,17 @@ run_setup <- function(config_file = "", ...) {
 
   # load the config file
   config <- read_yaml(config_file)
-  
+
   ################################
   ### SET PATHS
   paths <<- config$paths
-  for (p in c('base', 'static')) {
+
+  for (p in c("base", "static")) {
         # set base_path and static path first
+        if (!(p  %in% names(paths))) next
         if (!startsWith(paths[[p]], "/")) paths[[p]] <- file.path(home, paths[[p]])
         assign(str_glue("{p}_path"), paths[[p]], envir = .GlobalEnv)
   }
-
 
     get_nested_path(paths, root=base_path)
     config$paths <- paths
