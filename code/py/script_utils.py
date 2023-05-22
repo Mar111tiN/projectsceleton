@@ -129,7 +129,7 @@ def get_nested_path(path_dict, root="", pc={}):
             # a folder (substructure)
             # look ahead for root entry
             if 'root' in path_dict[name]:
-                subroot = path_dict[name]['root']
+                subroot = full_path(path_dict[name]['root'], base_folder=root)
             else:
                 subroot = os.path.join(root, name) 
             get_nested_path(path_dict[name], root=subroot, pc=pc)
@@ -178,8 +178,6 @@ def setup_config(config_file="", *, config_path="", **kwargs):
     directly passed arguments overwrite config
     '''
     ######## LOAD THE CONFIG ####################
-
-    print(config_file)
     # savely load the config file into config dict
     try:
         config = load_config_file(config_file, config_path)
