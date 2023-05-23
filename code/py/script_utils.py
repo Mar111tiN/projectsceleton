@@ -1,6 +1,7 @@
 import os
 import sys
 import pandas as pd
+import numpy as np
 from datetime import datetime as dt
 from yaml import CLoader as Loader, load
 from subprocess import PIPE, run
@@ -302,13 +303,27 @@ def convert2categorical(df, cat_cols={}, **kwargs):
     return df
 
 
+def convert2float(df, float_cols={}, round2=2, **kwargs):
+    '''
+    convert the cols to categorical columns with given order
+    '''
+    if float_cols == "all":
+        float_cols = [col for col, _dt in df.dtypes.items() if _dt == "float64"]
+
+    for col in float_cols:
+        df[col] = np.round(df[col].astype(float), round2)
+    return df
+
+
 def edit_cols(df, **kwargs):
     '''
     format the columns in a dataframe
     '''
+
     # convert date_cols
     df = convert2time(df, **kwargs)
     df = convert2int(df, **kwargs)
     df = convert2categorical(df, **kwargs)
     df = convert2str(df, **kwargs)
+    df = convert2float(df, **kwargs)
     return df
