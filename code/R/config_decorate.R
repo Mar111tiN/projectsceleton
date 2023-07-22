@@ -13,7 +13,7 @@ load_config <- function(    # only takes care of loading the right config
     config_file <- file.path(config_path, config_file)
     }
     if (!file.exists(config_file)) {
-        message(str_glue("Config file {config_file} cannot be found!"))
+        stop(str_glue("Config file {config_file} does not exist!"))
         return(NULL)
     }
     
@@ -21,8 +21,13 @@ load_config <- function(    # only takes care of loading the right config
 
     # go into the entry
     if (entry != "") {
-        config <- config[[entry]]
-        message(str_glue("Loading config {entry} from file {config_file}."))
+        if (entry %in% names(config)) {
+            config <- config[[entry]]
+            message(str_glue("Loading config {entry} from file {config_file}."))
+        } else {
+            stop(str_glue("Config file {config_file} does not contain entry for {entry}!"))
+            return(NULL)
+        }
     } else {
         message(str_glue("Loading config file {config_file}."))
     }
@@ -61,8 +66,15 @@ use_with_config <- function(
     ...                         # additional function arguments overwriting existing ones
     ) {
     
+
     force(config_file)      # prevent lazy evaluation of config file if passed as variable
     fname <- as.character(substitute(f))
+
+    # check wether f is a function
+    if (!is.function(f)) {
+        stop(str_glue("{fname} is not a function! --> Please pass a function as first argument!"))
+        return(NULL)
+    }
     if (entry == "") {
         entry <- fname  # get the name of the function to use as entry into config file
         message(str_glue("Decorating {fname} with config from {config_file}"))
@@ -88,8 +100,10 @@ use_with_config <- function(
         }
         config <- load_config(config_file, entry, convert_to_vector_list)
         if (is.null(config)) {
+            stop(str_glue("Config file {config_file} cannot be loaded!"))
             return(NULL)
         }
+
         config <- modifyList(config, fixed_args)
 
         # overwrite config arguments with directly passed arguments
