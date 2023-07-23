@@ -155,21 +155,22 @@ def load_config_file(config_file, config_path="", base_path=""):
 
         ######### EXTERNAL PATHS ###################
     # build base and other external paths relative to HOME path
-    path_config = config['paths']
+    if "paths" in config:
+        path_config = config['paths']
 
-    # extend the base and static paths
-    for path_key in ['base', 'static']:
-        if path_key in path_config:
-            path_config[path_key] = full_path(path_config[path_key])
-    
-    # overwrite the base path as config if not set
-    #     it might be set for external configs
-    path_config['base'] = base_path if base_path else full_path(path_config['base'])
+        # extend the base and static paths
+        for path_key in ['base', 'static']:
+            if path_key in path_config:
+                path_config[path_key] = full_path(path_config[path_key])
         
-    # build other paths nested relative to base path
-    get_nested_path(path_config, root=path_config['base'], pc=path_config)
+        # overwrite the base path as config if not set
+        #     it might be set for external configs
+        path_config['base'] = base_path if base_path else full_path(path_config['base'])
+            
+        # build other paths nested relative to base path
+        get_nested_path(path_config, root=path_config['base'], pc=path_config)
 
-    config['paths'] = path_config
+        config['paths'] = path_config
     return config
 
 
@@ -193,7 +194,7 @@ def setup_config(config_file="", *, config_path="", **kwargs):
     
     # build the output paths
     pc = config['paths']
-    for folder in ['output', 'img', 'tables', 'html', 'reports', 'src', 'Rmd']:
+    for folder in ['output', 'img', 'tables', 'html', 'reports', 'src', 'Rmd', 'datacols']:
         if folder in pc:
             if not os.path.isdir(pc[folder]):
                 show_output(f"Creating folder {pc[folder].replace(pc['base'], '')} in base folder")
@@ -219,8 +220,8 @@ def setup_config(config_file="", *, config_path="", **kwargs):
         if not config_name:
             break
         # try:
-        config2add = load_config_file(config['configs'][config_name], config_path=config['paths']['config'], base_path=config['paths']['base'])
         show_output(f"Loading additional config {config_name} from {config_name}")
+        config2add = load_config_file(config['configs'][config_name], config_path=config['paths']['config'], base_path=config['paths']['base'])
         config.update({config_name:config2add})
         # except:
         #     show_output(f"Additional config file {os.path.basename(config_file_added)} could not be loaded", color="warning")
@@ -265,6 +266,7 @@ def writeExcel(df_dict={}, excel_out="", dt_format="YYYY-MM-DD", fit_cols=True, 
                         len(str(series.name))  # len of column name/header
                         )) + extra_space, max_colwidth)  # adding a little extra space
                     _ = sheet.set_column(idx, idx, max_len)  # set column width
+
 
 ########### IO ###################################################
 def convert2time(df, date_cols=[], f="", **kwargs):
