@@ -82,7 +82,7 @@ def cmd2df(cmd, show=False, **kwargs):
 
 ############ PATH HELPER #######################################################
 
-def full_path(path, base_folder=os.environ['HOME']):
+def full_path(path, base_folder=os.environ['PROJECT_DIR']):
     '''
     extends any path with the base_folder if it is not a full path or starts with "."
     '''
@@ -91,7 +91,7 @@ def full_path(path, base_folder=os.environ['HOME']):
     return os.path.join(base_folder,path)
 
 
-def get_path(path, file_type="file", config={}, base_folder=os.environ['HOME']):
+def get_path(path, file_type="file", config={}, base_folder=os.environ['PROJECT_DIR']):
     '''
     retrieves a path value from the given key in the config and does some checks
     '''
@@ -154,7 +154,7 @@ def load_config_file(config_file, config_path="", base_path=""):
         config = load(stream, Loader=Loader)
 
         ######### EXTERNAL PATHS ###################
-    # build base and other external paths relative to HOME path
+    # build base and other external paths relative to PROJECT_DIR path
     if "paths" in config:
         path_config = config['paths']
 
@@ -209,7 +209,7 @@ def setup_config(config_file="", *, config_path="", **kwargs):
         for code_base in code_base_list:
             if code_base.endswith('/R'):
                 continue
-            code_base = full_path(code_base)
+            code_base = full_path(code_base, os.environ['REPODIR'])
             sys.path.append(code_base)
             show_output(f"Added {code_base} to python path for imports")
         del cc['py_core']
@@ -233,7 +233,7 @@ def setup_config(config_file="", *, config_path="", **kwargs):
             mawk_path = mawk_path[0]
         if mawk_path.endswith('/R') or mawk_path.endswith('/py'):
                 return config
-        cc['shell'] = full_path(mawk_path)
+        cc['shell'] = full_path(mawk_path, base_folder=os.environ['REPODIR'])
         show_output(f"Added shell path {mawk_path} to configs")
         del cc['shell_core']
     return config

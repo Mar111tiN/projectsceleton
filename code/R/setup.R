@@ -31,80 +31,89 @@ get_nested_path <- function(path_list, root="") {
             }
             get_nested_path(path_list[[name]], root=subroot)
             paths[[name]] <<- subroot
-            assign(str_glue("{tolower(name)}_path"), paths[[name]], envir = .GlobalEnv)
+            # assign(str_glue("{tolower(name)}_path"), paths[[name]], envir = .GlobalEnv)
         # entry is a path
         } else {
             paths[[name]] <<- file.path(root, path_list[[name]])
-            assign(str_glue("{name}_path"), file.path(root, path_list[[name]]), envir = .GlobalEnv)
+            # assign(str_glue("{name}_path"), file.path(root, path_list[[name]]), envir = .GlobalEnv)
         }
     }
 }
 
 
 run_setup <- function(config_file = "", ...) {
-  home <- Sys.getenv('HOME')
-  ### CHECKS
-  if (config_file == "") {
-    # add functionality for not finding the config file
-    message("You have to provide a config file")
-    return(NULL)
-  } 
-  if (!file.exists(config_file)) {
-    message(str_glue("config file {config_file} not found!"))
-    return(NULL)
-  }
+    home <- Sys.getenv('HOME')
+    ### CHECKS
+    if (config_file == "") {
+      # add functionality for not finding the config file
+      message("You have to provide a config file")
+      return(NULL)
+    } 
+    if (!file.exists(config_file)) {
+      message(str_glue("config file {config_file} not found!"))
+      return(NULL)
+    }
 
-  # load the config file
-  config <- read_yaml(config_file)
+    # load the config file
+    config <- read_yaml(config_file)
 
-  ################################
-  ### SET PATHS
-  paths <<- config$paths
+    ################################
+    ### SET PATHS
+    # paths has to be set globally for get_nested_path to have access
+    paths <<- config$paths
 
-  for (p in c("base", "static")) {
+    for (p in c("base", "static")) {
         # set base_path and static path first
-        if (!(p  %in% names(paths))) next
+        if (!(p %in% names(paths))) next
         if (!startsWith(paths[[p]], "/")) paths[[p]] <- file.path(home, paths[[p]])
-        assign(str_glue("{p}_path"), paths[[p]], envir = .GlobalEnv)
-  }
+        # assign(str_glue("{p}_path"), paths[[p]], envir = .GlobalEnv)
+    }
+    if (!("base") %in% names(paths)) paths$base <- Sys.getenv("PROJECT_DIR")
+    if (paths$base == "") message("Warning - base path has not been set! (no base path in setups and no PROJECT_DIR envvariable)")
 
-    get_nested_path(paths, root=base_path)
-    config$paths <- paths
+
+    get_nested_path(paths, root=paths$base)
 
     ######## CREATE ALL FOLDERS (IF NOT EXISTING)
-    for (path in c(
-        data_path,
-        results_path,
-        config_path,
-        tables_path,
-        img_path,
-        reports_path
+    for (path in names(paths)) {
+      if (! path  %in% c(
+        "data",
+        "results",
+        "config",
+        "tables",
+        "img",
+        "reports"
     )) {
-
       if (!dir.exists(path)) {
         print(str_glue("Creating folder {path}"))
             dir.create(path, recursive=TRUE)
         }
     }
+    }
 
-  # LOAD R CODE
-  cc <- config$code
-  # R_path_save <- R_path
-  # go through R_core path list
-  for (path in names(cc$R_core)) {
-    if (!startsWith(path, "/")) {
-      R_path <<- file.path(home, path)
-    } else {
-      R_path <<- path
+    # LOAD R CODE
+    cc <- config$code
+    paths$repo <- Sys.getenv("REPODIR")
+    # R_path_save <- R_path
+    # go through R_core path list
+    for (path in names(cc$R_core)) {
+        if (!startsWith(path, "/")) {
+        if (paths$repo == "") {
+            message(str_glue("Environment variable REPODIR is not set --> cannot source {path}"))
+            next
+        } 
+        # R_path has to be loaded globally so subfiles can be loaded!
+        R_path <<- file.path(paths$repo, path)
+        } else {
+            R_path <<- path
+        }
+        for (file in cc$R_core[[path]]) {
+            R_file <- file.path(R_path, file)
+            print(str_glue("Loading data from {R_file}"))
+            source(R_file)
+        }
     }
-    for (file in cc$R_core[[path]]) {
-      R_file <- file.path(R_path, file)
-      print(str_glue("Loading data from {R_file}"))
-      source(R_file)
-    }
-    # R_path <<- R_path_save
-  }
-  
+
   # set the threads
   if ("threads" %in% names(cc)) {
     library(BiocParallel)
@@ -126,17 +135,22 @@ run_setup <- function(config_file = "", ...) {
 
   # update the config arguments with function arguments
   args <- modifyList(config, args)
+
+  ### flush global envs and move paths to config
+  config$paths <- NULL
+  R_path <<- NULL
+  # paths <<- NULL
   return(config)
 }
 
 
 load_data <- function() {
     ### checks if RData file RData_path exits and loads it 
-    # extend the file path  
-    if (!endsWith(RData_path, ".RData")) RData_path <<- str_glue("{RData_path}.RData")
-        if (file.exists(RData_path)) {
-            load(RData_path, envir=.GlobalEnv)
-            message(str_glue("Data loaded from {RData_path}"))
+    # extend the file path
+    if (!endsWith(paths$RData, ".RData")) paths$RData <<- str_glue("{paths$RData}.RData")
+        if (file.exists(paths$RData)) {
+            load(paths$RData, envir=.GlobalEnv)
+            message(str_glue("Data loaded from {paths$RData}"))
             return(1)
     } else return(0)
 }
