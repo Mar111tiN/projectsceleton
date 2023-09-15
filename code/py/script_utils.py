@@ -145,7 +145,6 @@ def load_config_file(config_file, config_path="", base_path=""):
     # build the config_file path from config_file and config_path arguments
     if config_path and not config_file.startswith("/"):
         config_file = full_path(os.path.join(config_path, config_file))
-
     # add the extension if needed
     if not os.path.splitext(config_file)[-1] in [".yml", "yaml"]:
         config_file = config_file + ".yml"
@@ -157,12 +156,12 @@ def load_config_file(config_file, config_path="", base_path=""):
     # build base and other external paths relative to PROJECT_DIR path
     if "paths" in config:
         path_config = config['paths']
-
         # extend the base and static paths
         for path_key in ['base', 'static']:
             if path_key in path_config:
-                path_config[path_key] = full_path(path_config[path_key])
-        
+                path_config[path_key] = full_path(path_config[path_key], base_folder=os.environ['HOME'])
+        if not 'base' in path_key:
+            path_config['base'] = os.environ['PROJECT_DIR']
         # overwrite the base path as config if not set
         #     it might be set for external configs
         path_config['base'] = base_path if base_path else full_path(path_config['base'])
