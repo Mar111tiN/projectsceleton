@@ -300,6 +300,9 @@ def convert2categorical(df, cat_cols={}, **kwargs):
     convert the cols to categorical columns with given order
     '''
     for col in cat_cols:
+        miss_cols = [c for c in df[col].unique() if not c in cat_cols[col]]
+        if len(miss_cols):
+            show_output(f"<convert2categorical> Found {col} value(s) {'|'.join(miss_cols)} missing in data --> please adjust factors in meta config!", color="warning")
         df[col] = pd.Categorical(df[col], cat_cols[col])
     return df
 
