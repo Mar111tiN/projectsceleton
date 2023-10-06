@@ -38,6 +38,7 @@ get_nested_path <- function(path_list, root="") {
             # assign(str_glue("{name}_path"), file.path(root, path_list[[name]]), envir = .GlobalEnv)
         }
     }
+  return(paths)
 }
 
 
@@ -72,23 +73,14 @@ run_setup <- function(config_file = "", ...) {
     if (paths$base == "") message("Warning - base path has not been set! (no base path in setups and no PROJECT_DIR envvariable)")
 
 
-    get_nested_path(paths, root=paths$base)
+    temp_paths <- get_nested_path(paths, root=paths$base)
 
     ######## CREATE ALL FOLDERS (IF NOT EXISTING)
-    for (path in names(paths)) {
-      if (! path  %in% c(
-        "data",
-        "results",
-        "config",
-        "tables",
-        "img",
-        "reports"
-    )) {
-      if (!dir.exists(path)) {
-        print(str_glue("Creating folder {path}"))
-            dir.create(path, recursive=TRUE)
-        }
-    }
+    for (p in names(temp_paths)) {
+      if (!dir.exists(temp_paths[[p]])) {
+        print(str_glue("Creating folder {temp_paths[[p]]}"))
+            dir.create(temp_paths[[p]], recursive=TRUE)
+      }
     }
 
     # LOAD R CODE
@@ -130,6 +122,9 @@ run_setup <- function(config_file = "", ...) {
     options(java.parameters = str_glue("-Xmx{mem}"))
   }
 
+  # set VROOM_CONNECTION_SIZE for reading large datasets like TCGA
+  Sys.setenv("VROOM_CONNECTION_SIZE" = 500000L)
+
   # get args to list
   args <- list(...)
 
@@ -153,4 +148,10 @@ load_data <- function() {
             message(str_glue("Data loaded from {paths$RData}"))
             return(1)
     } else return(0)
+}
+
+
+load_packages <- function(package_file) {
+  package_list <- read.table(package_file, header=FALSE)[, 1]
+  BiocManager::install(package_list, update=FALSE, Ncpus=parallel::detectCores()-1)
 }
