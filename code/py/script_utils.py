@@ -251,13 +251,15 @@ def writeExcel(df_dict={}, excel_out="", dt_format="YYYY-MM-DD", fit_cols=True, 
 
         if isinstance(df_dict, dict):
             for sheetname, df in df_dict.items():
-                df.to_excel(writer, sheet_name=sheetname, index=False)
+                df.to_excel(writer, sheet_name=sheetname, index=isinstance(df.columns, pd.MultiIndex))
         else:
             show_output("df_dict (first arg) must be either dict or pd.DataFrame!", color="error")
             return None
         if fit_cols:
             for sheetname, sheet in writer.sheets.items():
                 df = df_dict[sheetname]
+                if isinstance(df.columns, pd.MultiIndex):
+                    continue
                 for idx, col in enumerate(df):  # loop through all columns
                     series = df[col]
                     max_len = min(max((
@@ -303,7 +305,7 @@ def convert2categorical(df, cat_cols={}, **kwargs):
         miss_cols = [c for c in df[col].unique() if not c in cat_cols[col]]
         if len(miss_cols):
             show_output(f"<convert2categorical> Found {col} value(s) {'|'.join(miss_cols)} missing in data --> please adjust factors in meta config!", color="warning")
-        df[col] = pd.Categorical(df[col], cat_cols[col])
+        df[col] = pd.Categorical(df[col], cat_cols[col], ordered=True)
     return df
 
 
