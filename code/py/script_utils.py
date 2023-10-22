@@ -137,7 +137,7 @@ def get_nested_path(path_dict, root="", pc={}):
             pc[name] = subroot
             
 
-def load_config_file(config_file, config_path="", base_path=""):
+def load_config_file(config_file, config_path="", base_path="", main_config=False):
     '''
     loads a yaml_config
     '''
@@ -148,7 +148,6 @@ def load_config_file(config_file, config_path="", base_path=""):
     # add the extension if needed
     if not os.path.splitext(config_file)[-1] in [".yml", "yaml"]:
         config_file = config_file + ".yml"
-
     with open(config_file, "r") as stream:
         config = load(stream, Loader=Loader)
 
@@ -160,7 +159,8 @@ def load_config_file(config_file, config_path="", base_path=""):
         for path_key in ['base', 'static']:
             if path_key in path_config:
                 path_config[path_key] = full_path(path_config[path_key], base_folder=os.environ['HOME'])
-        if not 'base' in path_key:
+        if main_config and not 'base' in path_config:
+            show_output(f"base path set to env variable $PROJECT_DIR {os.environ['PROJECT_DIR']}")
             path_config['base'] = os.environ['PROJECT_DIR']
         # overwrite the base path as config if not set
         #     it might be set for external configs
@@ -168,7 +168,6 @@ def load_config_file(config_file, config_path="", base_path=""):
             
         # build other paths nested relative to base path
         get_nested_path(path_config, root=path_config['base'], pc=path_config)
-
         config['paths'] = path_config
     return config
 
@@ -181,7 +180,7 @@ def setup_config(config_file="", *, config_path="", **kwargs):
     ######## LOAD THE CONFIG ####################
     # savely load the config file into config dict
     try:
-        config = load_config_file(config_file, config_path)
+        config = load_config_file(config_file, config_path, main_config=True)
     except:
         show_output(f"config file {config_file} could not be loaded", color="warning")
         return {}
