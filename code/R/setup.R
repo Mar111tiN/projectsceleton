@@ -82,6 +82,18 @@ run_setup <- function(config_file = "", ...) {
             dir.create(temp_paths[[p]], recursive=TRUE)
       }
     }
+    # load additional configs
+    for (add_config in names(config$configs)) {
+      message(str_glue("Loading additional config {add_config}"))
+      add_config_file <- file.path(temp_paths$config, config$configs[[add_config]])
+      if (!endsWith(add_config_file, ".yml")) add_config_file <- str_glue("{add_config_file}.yml")
+      add_conf <- read_yaml(add_config_file)
+      # adding the added paths to the temp_paths for global paths variable
+      temp_paths <- get_nested_path(add_conf$paths, root=paths$base)
+      add_conf$paths <- NULL
+      config[[add_config]] <- add_conf
+    } 
+
 
     # LOAD R CODE
     cc <- config$code
@@ -132,7 +144,7 @@ run_setup <- function(config_file = "", ...) {
   args <- modifyList(config, args)
 
   ### flush global envs and move paths to config
-  config$paths <- NULL
+  config$paths <- paths
   R_path <<- NULL
   # paths <<- NULL
   return(config)
