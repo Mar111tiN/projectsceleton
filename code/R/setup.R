@@ -77,6 +77,11 @@ run_setup <- function(config_file = "", ...) {
 
     ######## CREATE ALL FOLDERS (IF NOT EXISTING)
     for (p in names(temp_paths)) {
+      if (p == "RData") {
+        if (!endsWith(temp_paths$RData, ".RData")) paths$RData <<- str_glue("{temp_paths$RData}.RData")
+        next
+      }
+    
       if (!dir.exists(temp_paths[[p]])) {
         print(str_glue("Creating folder {temp_paths[[p]]}"))
             dir.create(temp_paths[[p]], recursive=TRUE)
@@ -153,12 +158,10 @@ run_setup <- function(config_file = "", ...) {
 
 load_data <- function() {
     ### checks if RData file RData_path exits and loads it 
-    # extend the file path
-    if (!endsWith(paths$RData, ".RData")) paths$RData <<- str_glue("{paths$RData}.RData")
-        if (file.exists(paths$RData)) {
-            load(paths$RData, envir=.GlobalEnv)
-            message(str_glue("Data loaded from {paths$RData}"))
-            return(1)
+    if (file.exists(paths$RData)) {
+        load(paths$RData, envir=.GlobalEnv)
+        message(str_glue("Data loaded from {paths$RData}"))
+        return(1)
     } else return(0)
 }
 
