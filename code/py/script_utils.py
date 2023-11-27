@@ -125,7 +125,8 @@ def get_nested_path(path_dict, root="", pc={}):
         # check whether this is a path or a folder (substructure)
         if isinstance(path_dict[name], str):
             # if it is a path, set it in path config
-            pc[name] = full_path(path_dict[name], root)
+            if path_dict[name]:
+                pc[name] = full_path(path_dict[name], root)
         else:
             # a folder (substructure)
             # look ahead for root entry
@@ -177,6 +178,7 @@ def setup_config(config_file="", *, config_path="", **kwargs):
     passes configs to inner functions
     directly passed arguments overwrite config
     '''
+
     ######## LOAD THE CONFIG ####################
     # savely load the config file into config dict
     try:
