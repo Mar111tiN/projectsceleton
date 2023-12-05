@@ -285,7 +285,7 @@ def convert2int(df, int_cols=[], int_default=-1, **kwargs):
     convert strings in cols of df to time format
     '''
     for col in int_cols:
-        df.loc[:, col] = df[col].fillna(int_default).astype(int)
+        df.loc[:, col] = df[col].fillna(int_default).astype(float).astype(int)
     return df
 
 
