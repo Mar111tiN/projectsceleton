@@ -34,7 +34,10 @@ get_nested_path <- function(path_list, root="") {
             # assign(str_glue("{tolower(name)}_path"), paths[[name]], envir = .GlobalEnv)
         # entry is a path
         } else {
-            paths[[name]] <<- file.path(root, path_list[[name]])
+            if (startsWith(path_list[[name]], "/")) {
+              paths[[name]] <<- path_list[[name]]
+            } else paths[[name]] <<- file.path(root, path_list[[name]])
+            
             # assign(str_glue("{name}_path"), file.path(root, path_list[[name]]), envir = .GlobalEnv)
         }
     }
@@ -82,9 +85,9 @@ run_setup <- function(config_file = "", ...) {
         next
       }
     
-      if (!dir.exists(temp_paths[[p]])) {
+      if (!dir.exists(temp_paths[[p]]) & !(grepl(".", temp_paths[[p]]))) {
         print(str_glue("Creating folder {temp_paths[[p]]}"))
-            dir.create(temp_paths[[p]], recursive=TRUE)
+          dir.create(temp_paths[[p]], recursive=TRUE)
       }
     }
     # load additional configs
