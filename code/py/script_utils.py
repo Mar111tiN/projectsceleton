@@ -194,7 +194,7 @@ def setup_config(config_file="", *, config_path="", **kwargs):
     
     # build the output paths
     pc = config['paths']
-    for folder in ['output', 'img', 'tables', 'html', 'reports', 'src', 'Rmd', 'datacols']:
+    for folder in ['output', 'img', 'tables', 'html', 'reports', 'src', 'Rmd', 'datacols', 'Data', 'Original', 'Derived']:
         if folder in pc:
             if not os.path.isdir(pc[folder]):
                 show_output(f"Creating folder {pc[folder].replace(pc['base'], '')} in base folder")
