@@ -19,10 +19,19 @@ load_config <- function(    # only takes care of loading the right config
     
     config <- read_yaml(config_file)
 
+    # load the default config if existing
+    if ("default"  %in% names(config)) {
+        # store in default
+        default_config <- config[["default"]]
+        config$default <- NULL 
+    } else {
+        default_config <- list()
+    }
+
     # go into the entry
     if (entry != "") {
         if (entry %in% names(config)) {
-            config <- config[[entry]]
+            config <- modifyList(default_config, config[[entry]])
             message(str_glue("Loading config {entry} from file {config_file}."))
         } else {
             stop(str_glue("Config file {config_file} does not contain entry for {entry}!"))
@@ -83,7 +92,10 @@ use_with_config <- function(
     }
     fixed_args <- list(...)
     ... <- NULL
-    ######### create the function
+
+
+
+    ######### create the function that will be implicitely returned
     function(
         data="",                   # the data is always the first argument after the function
         ...
@@ -98,6 +110,7 @@ use_with_config <- function(
             if (args[['config_file']] != "") config_file <- args[['config_file']]
             args[['config_file']] <- NULL
         }
+        # load the entry-specific config including the defaults
         config <- load_config(config_file, entry, convert_to_vector_list)
         if (is.null(config)) {
             stop(str_glue("Config file {config_file} cannot be loaded!"))
@@ -106,7 +119,8 @@ use_with_config <- function(
 
         config <- modifyList(config, fixed_args)
 
-        # overwrite config arguments with directly passed arguments
+        # overwrite config arguments with directly passed arguments and pass the data object as first argumemt
+        #   data object is a requirement for all decorated functions
         config <- modifyList(config, c(list(data=data), args))
         # call the respective function
         do.call(f, config)
