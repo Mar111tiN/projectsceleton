@@ -32,7 +32,6 @@ colors = {
 }
 
 
-
 def show_output(text, color="normal", multi=False, time=False, **kwargs):
     """
     get colored output to the terminal
@@ -43,6 +42,7 @@ def show_output(text, color="normal", multi=False, time=False, **kwargs):
     proc = f"\033{colors['process']}Process {os.getpid()}\033[0m : " if multi else ""
     text = f"\033{colors[color]}{text}\033[0m"
     print(time + proc + text, **kwargs)
+
 
 def show_command(command, list=False, multi=True, **kwargs):
     """
@@ -305,7 +305,7 @@ def convert2categorical(df, cat_cols={}, **kwargs):
     for col in cat_cols:
         miss_cols = [c for c in df[col].unique() if not c in cat_cols[col]]
         if len(miss_cols):
-            show_output(f"<convert2categorical> Found {col} value(s) {'|'.join(miss_cols)} missing in data --> please adjust factors in meta config!", color="warning")
+            show_output(f"<convert2categorical> Found {col} value(s) {'|'.join(miss_cols)} missing in data --> please adjust factors!", color="warning")
         df[col] = pd.Categorical(df[col], cat_cols[col], ordered=True)
     return df
 
